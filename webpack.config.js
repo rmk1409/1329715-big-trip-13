@@ -1,4 +1,4 @@
-const path = require(`path`);
+const path = require("path");
 
 module.exports = {
   context: path.resolve(__dirname, "src"),
@@ -6,11 +6,11 @@ module.exports = {
   entry: "./main.js",
   output: {
     filename: "bundle.js",
-    path: path.resolve(__dirname, `public`)
+    path: path.resolve(__dirname, "public")
   },
   devtool: "source-map",
   devServer: {
-    contentBase: path.join(__dirname, 'public'),
+    contentBase: path.join(__dirname, "public"),
     watchContentBase: true,
     compress: true
   }
