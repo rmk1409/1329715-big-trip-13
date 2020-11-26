@@ -23,8 +23,18 @@ const setDates = (point) => {
   point.endDate = endDate;
 };
 
+const getPointIDGenerator = () => {
+  let i = 1;
+  return () => {
+    return i++;
+  };
+};
+
+const idGenerator = getPointIDGenerator();
+
 const generatePoint = () => {
   const point = {
+    id: idGenerator(),
     type: getRandomValueOfArray(TYPES),
     destination: getRandomValueOfArray(CITIES),
     offers: getOffers(),
