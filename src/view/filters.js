@@ -1,3 +1,5 @@
+import Util from "../mock/util";
+
 const createFiltersTemplate = () => {
   return `<form class="trip-filters" action="#" method="get">
               <div class="trip-filters__filter">
@@ -19,4 +21,28 @@ const createFiltersTemplate = () => {
           </form>`;
 };
 
-export {createFiltersTemplate};
+const util = new Util();
+
+class Filters {
+  constructor() {
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createFiltersTemplate();
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = util.createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+
+export default Filters;

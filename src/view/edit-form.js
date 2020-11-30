@@ -1,8 +1,10 @@
 import {CITIES} from "../mock/point";
-import {getEditOffers} from "./editOffers";
+import EditOffers from "./editOffers";
+import Util from "../mock/util";
 
 const createDestinationlist = () => {
-  return CITIES.slice().map((city) => `<option value="${city}"></option>`).join(``);
+  return CITIES.slice()
+    .map((city) => `<option value="${city}"></option>`).join(``);
 };
 
 const createEditFormTemplate = (point) => {
@@ -15,6 +17,8 @@ const createEditFormTemplate = (point) => {
     offers = [],
     info: {description = ``, photos = []}
   } = point;
+
+  const editOffers = new EditOffers(point);
 
   const startDateAndTime = startDate ? startDate.format(`DD/MM/YY MM:HH`) : ``;
   const endDateAndTime = endDate ? endDate.format(`DD/MM/YY MM:HH`) : ``;
@@ -119,7 +123,7 @@ const createEditFormTemplate = (point) => {
                   <section class="event__section  event__section--offers">
                     ${offers.length > 0 ? ` <h3 class="event__section-title  event__section-title--offers">Offers</h3>
                      <div class="event__available-offers">
-                            ${getEditOffers(point)}
+                            ${editOffers.getTemplate()}
                     </div>` : ``}
                   </section>
 
@@ -138,4 +142,29 @@ const createEditFormTemplate = (point) => {
             </li>`;
 };
 
-export {createEditFormTemplate};
+const util = new Util();
+
+class EditForm {
+  constructor(point) {
+    this._point = point;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createEditFormTemplate(this._point);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = util.createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+
+export default EditForm;

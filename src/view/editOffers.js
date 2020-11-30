@@ -1,4 +1,5 @@
 import {OFFERS} from "../mock/offer";
+import Util from "../mock/util";
 
 const getEditOffers = ({id, offers: pointOffers}) => {
   return OFFERS.map((curOffer) => {
@@ -14,4 +15,29 @@ const getEditOffers = ({id, offers: pointOffers}) => {
   }).join(``);
 };
 
-export {getEditOffers};
+const util = new Util();
+
+class EditOffers {
+  constructor(point) {
+    this._point = point;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return getEditOffers(this._point);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = util.createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+
+export default EditOffers;

@@ -1,3 +1,5 @@
+import Util from "../mock/util";
+
 const createOfferTemplate = (offer) => {
   const {name, price} = offer;
   return `<li class="event__offer">
@@ -7,4 +9,29 @@ const createOfferTemplate = (offer) => {
           </li>`;
 };
 
-export {createOfferTemplate};
+const util = new Util();
+
+class Offer {
+  constructor(offers) {
+    this._offers = offers;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return this._offers.map((offer)=>createOfferTemplate(offer)).join(``);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = util.createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+
+export default Offer;

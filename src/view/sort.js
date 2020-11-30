@@ -1,3 +1,5 @@
+import Util from "../mock/util";
+
 const createSortTemplate = () => {
   return `<form class="trip-events__trip-sort  trip-sort" action="#" method="get">
             <div class="trip-sort__item  trip-sort__item--day">
@@ -27,4 +29,28 @@ const createSortTemplate = () => {
           </form>`;
 };
 
-export {createSortTemplate};
+const util = new Util();
+
+class Sort {
+  constructor() {
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createSortTemplate();
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = util.createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+
+export default Sort;

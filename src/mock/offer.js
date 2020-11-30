@@ -1,6 +1,8 @@
-import {getRandomValueOfArray} from "./util";
+import Util from "./util";
 
 const MAX_OFFER_COUNT = 5;
+
+const util = new Util();
 
 const OFFERS = [
   {
@@ -34,7 +36,7 @@ const getOffers = () => {
   const offers = new Set();
   const offersCount = (Math.random() * MAX_OFFER_COUNT).toFixed();
   while (offers.size < offersCount) {
-    offers.add(getRandomValueOfArray(OFFERS));
+    offers.add(util.getRandomValueOfArray(OFFERS));
   }
   return Array.from(offers);
 };
