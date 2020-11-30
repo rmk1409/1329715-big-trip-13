@@ -1,13 +1,12 @@
-import {getDateDifference} from "../mock/util";
-import {createOfferTemplate} from "./offer";
+import Util from "../mock/util";
+import Offer from "./offer";
 
 const createTripEventsItemTemplate = (point) => {
   const {startDate, type, destination, endDate, price, offers, isFavorite} = point;
   const evt = `${type} ${destination}`.trim();
-  const diff = getDateDifference(startDate, endDate);
+  const diff = new Util().getDateDifference(startDate, endDate);
 
-  const offersMarkup = offers.map((offer) => createOfferTemplate(offer))
-    .join(``);
+  const offersMarkup = new Offer(offers).getTemplate();
 
   return `<li class="trip-events__item">
               <div class="event">
@@ -44,4 +43,27 @@ const createTripEventsItemTemplate = (point) => {
             </li>`;
 };
 
-export {createTripEventsItemTemplate};
+class TripEventsItem {
+  constructor(point) {
+    this._point = point;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createTripEventsItemTemplate(this._point);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = Util.createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+
+export default TripEventsItem;

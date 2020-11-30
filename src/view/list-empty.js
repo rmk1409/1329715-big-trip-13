@@ -1,17 +1,16 @@
 import Util from "../mock/util";
 
-const createTripEventsList = () => {
-  return `<ul class="trip-events__list">
-          </ul>`;
+const createEmptyListTemplate = () => {
+  return `<p class="trip-events__msg">Click New Event to create your first point</p>`;
 };
 
-class TripEventsList {
+class ListEmpty {
   constructor() {
     this._element = null;
   }
 
   getTemplate() {
-    return createTripEventsList();
+    return createEmptyListTemplate();
   }
 
   getElement() {
@@ -27,4 +26,4 @@ class TripEventsList {
   }
 }
 
-export default TripEventsList;
+export default ListEmpty;

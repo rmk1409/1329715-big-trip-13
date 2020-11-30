@@ -1,7 +1,9 @@
-import {getRandomValueOfArray} from "./util";
+import Util from "./util";
 
 const MAX_DESCRIPTION_LENGTH = 5;
 const MAX_PHOTO_COUNT = 7;
+
+const util = new Util();
 
 const DESCRIPTIONS = [
   `Lorem ipsum dolor sit amet, consectetur adipiscing elit.`,
@@ -21,7 +23,7 @@ const getDescription = () => {
   const descriptions = new Set();
   const descriptionCount = Math.ceil(Math.random() * MAX_DESCRIPTION_LENGTH);
   while (descriptions.size < descriptionCount) {
-    descriptions.add(getRandomValueOfArray(DESCRIPTIONS));
+    descriptions.add(util.getRandomValueOfArray(DESCRIPTIONS));
   }
   return Array.from(descriptions).join(``);
 };

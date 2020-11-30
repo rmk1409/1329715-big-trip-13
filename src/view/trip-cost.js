@@ -1,3 +1,5 @@
+import Util from "../mock/util";
+
 const createTripCostTemplate = (points) => {
   const total = points.reduce((acc, curVal) => acc + curVal.price, 0);
 
@@ -6,4 +8,27 @@ const createTripCostTemplate = (points) => {
           </p>`;
 };
 
-export {createTripCostTemplate};
+class TripCost {
+  constructor(points) {
+    this._points = points;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createTripCostTemplate(this._points);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = Util.createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+
+export default TripCost;

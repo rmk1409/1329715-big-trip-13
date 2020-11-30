@@ -1,3 +1,5 @@
+import Util from "../mock/util";
+
 const createTripInfoTemplate = (points) => {
   const firstPoint = points[0];
   const lastPoint = points[points.length - 1];
@@ -22,4 +24,27 @@ const createTripInfoTemplate = (points) => {
           </section>`;
 };
 
-export {createTripInfoTemplate};
+class TripInfo {
+  constructor(points) {
+    this._points = points;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createTripInfoTemplate(this._points);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = Util.createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+
+export default TripInfo;
