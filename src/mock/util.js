@@ -36,7 +36,7 @@ class Util {
     return diff;
   }
 
-  createElement(template) {
+  static createElement(template) {
     const div = document.createElement(`div`);
     div.innerHTML = template;
 

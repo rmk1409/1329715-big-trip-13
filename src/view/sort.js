@@ -29,8 +29,6 @@ const createSortTemplate = () => {
           </form>`;
 };
 
-const util = new Util();
-
 class Sort {
   constructor() {
     this._element = null;
@@ -42,7 +40,7 @@ class Sort {
 
   getElement() {
     if (!this._element) {
-      this._element = util.createElement(this.getTemplate());
+      this._element = Util.createElement(this.getTemplate());
     }
 
     return this._element;

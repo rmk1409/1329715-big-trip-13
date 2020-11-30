@@ -7,8 +7,6 @@ const createMenuTemplate = () => {
           </nav>`;
 };
 
-const util = new Util();
-
 class Menu {
   constructor() {
     this._element = null;
@@ -20,7 +18,7 @@ class Menu {
 
   getElement() {
     if (!this._element) {
-      this._element = util.createElement(this.getTemplate());
+      this._element = Util.createElement(this.getTemplate());
     }
 
     return this._element;

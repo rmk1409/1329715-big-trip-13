@@ -15,8 +15,6 @@ const getEditOffers = ({id, offers: pointOffers}) => {
   }).join(``);
 };
 
-const util = new Util();
-
 class EditOffers {
   constructor(point) {
     this._point = point;
@@ -29,7 +27,7 @@ class EditOffers {
 
   getElement() {
     if (!this._element) {
-      this._element = util.createElement(this.getTemplate());
+      this._element = Util.createElement(this.getTemplate());
     }
 
     return this._element;

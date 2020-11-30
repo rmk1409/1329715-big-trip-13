@@ -9,8 +9,6 @@ const createOfferTemplate = (offer) => {
           </li>`;
 };
 
-const util = new Util();
-
 class Offer {
   constructor(offers) {
     this._offers = offers;
@@ -23,7 +21,7 @@ class Offer {
 
   getElement() {
     if (!this._element) {
-      this._element = util.createElement(this.getTemplate());
+      this._element = Util.createElement(this.getTemplate());
     }
 
     return this._element;

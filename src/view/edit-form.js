@@ -18,8 +18,6 @@ const createEditFormTemplate = (point) => {
     info: {description = ``, photos = []}
   } = point;
 
-  const editOffers = new EditOffers(point);
-
   const startDateAndTime = startDate ? startDate.format(`DD/MM/YY MM:HH`) : ``;
   const endDateAndTime = endDate ? endDate.format(`DD/MM/YY MM:HH`) : ``;
 
@@ -123,7 +121,7 @@ const createEditFormTemplate = (point) => {
                   <section class="event__section  event__section--offers">
                     ${offers.length > 0 ? ` <h3 class="event__section-title  event__section-title--offers">Offers</h3>
                      <div class="event__available-offers">
-                            ${editOffers.getTemplate()}
+                            ${new EditOffers(point).getTemplate()}
                     </div>` : ``}
                   </section>
 
@@ -142,8 +140,6 @@ const createEditFormTemplate = (point) => {
             </li>`;
 };
 
-const util = new Util();
-
 class EditForm {
   constructor(point) {
     this._point = point;
@@ -156,7 +152,7 @@ class EditForm {
 
   getElement() {
     if (!this._element) {
-      this._element = util.createElement(this.getTemplate());
+      this._element = Util.createElement(this.getTemplate());
     }
 
     return this._element;

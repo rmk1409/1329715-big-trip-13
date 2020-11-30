@@ -21,8 +21,6 @@ const createFiltersTemplate = () => {
           </form>`;
 };
 
-const util = new Util();
-
 class Filters {
   constructor() {
     this._element = null;
@@ -34,7 +32,7 @@ class Filters {
 
   getElement() {
     if (!this._element) {
-      this._element = util.createElement(this.getTemplate());
+      this._element = Util.createElement(this.getTemplate());
     }
 
     return this._element;

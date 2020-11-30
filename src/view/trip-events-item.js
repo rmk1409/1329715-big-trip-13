@@ -1,12 +1,10 @@
 import Util from "../mock/util";
 import Offer from "./offer";
 
-const util = new Util();
-
 const createTripEventsItemTemplate = (point) => {
   const {startDate, type, destination, endDate, price, offers, isFavorite} = point;
   const evt = `${type} ${destination}`.trim();
-  const diff = util.getDateDifference(startDate, endDate);
+  const diff = new Util().getDateDifference(startDate, endDate);
 
   const offersMarkup = new Offer(offers).getTemplate();
 
@@ -57,7 +55,7 @@ class TripEventsItem {
 
   getElement() {
     if (!this._element) {
-      this._element = util.createElement(this.getTemplate());
+      this._element = Util.createElement(this.getTemplate());
     }
 
     return this._element;

@@ -8,8 +8,6 @@ const createTripCostTemplate = (points) => {
           </p>`;
 };
 
-const util = new Util();
-
 class TripCost {
   constructor(points) {
     this._points = points;
@@ -22,7 +20,7 @@ class TripCost {
 
   getElement() {
     if (!this._element) {
-      this._element = util.createElement(this.getTemplate());
+      this._element = Util.createElement(this.getTemplate());
     }
 
     return this._element;
