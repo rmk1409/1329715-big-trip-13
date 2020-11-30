@@ -43,7 +43,7 @@ class Util {
     return div.firstChild;
   }
 
-  render(container, element, place) {
+  static render(container, element, place) {
     switch (place) {
       case RenderPosition.AFTER_END:
         container.parentNode.insertBefore(element, container.nextSibling);

@@ -9,10 +9,9 @@ import TripEventsItem from './view/trip-events-item';
 import Util from "./mock/util";
 
 import {generatePoint} from "./mock/point";
+import ListEmpty from "./view/list-empty";
 
 const ITEM_COUNT = 20;
-
-const util = new Util();
 
 const tripMain = document.querySelector(`.trip-main`);
 const tripControls = tripMain.querySelector(`.trip-controls`);
@@ -21,10 +20,10 @@ const filterHeader = tripControls.querySelector(`h2:nth-child(2)`);
 const tripEvents = document.querySelector(`.trip-events`);
 const tripSortHeader = tripEvents.querySelector(`h2:first-child`);
 
-util.render(menuHeader, new Menu().getElement(), `afterend`);
-util.render(filterHeader, new Filters().getElement(), `afterend`);
-util.render(tripSortHeader, new Sort().getElement(), `afterend`);
-util.render(tripEvents, new TripEventsList().getElement(), `beforeend`);
+Util.render(menuHeader, new Menu().getElement(), `afterend`);
+Util.render(filterHeader, new Filters().getElement(), `afterend`);
+Util.render(tripSortHeader, new Sort().getElement(), `afterend`);
+Util.render(tripEvents, new TripEventsList().getElement(), `beforeend`);
 
 const points = [];
 for (let i = 0; i < ITEM_COUNT; i++) {
@@ -58,12 +57,16 @@ const renderPoint = (point) => {
     document.removeEventListener(`keydown`, onEscKeyDown);
   });
 
-  util.render(tripEventsList, evtElement, `beforeend`);
+  Util.render(tripEventsList, evtElement, `beforeend`);
 };
 
-for (let i = 0; i < points.length; i++) {
-  renderPoint(points[i]);
+if (points.length === 0) {
+  Util.render(tripEvents, new ListEmpty().getElement(), `beforeend`);
+} else {
+  for (let i = 0; i < points.length; i++) {
+    renderPoint(points[i]);
+  }
 }
 
-util.render(tripMain, new TripInfo(points).getElement(), `afterbegin`);
-util.render(tripMain.querySelector(`.trip-info`), new TripCost(points).getElement(), `beforeend`);
+Util.render(tripMain, new TripInfo(points).getElement(), `afterbegin`);
+Util.render(tripMain.querySelector(`.trip-info`), new TripCost(points).getElement(), `beforeend`);
