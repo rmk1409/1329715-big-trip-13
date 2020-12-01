@@ -1,4 +1,4 @@
-import Util from "../mock/util";
+import {createElement} from "../utils";
 
 const createEmptyListTemplate = () => {
   return `<p class="trip-events__msg">Click New Event to create your first point</p>`;
@@ -15,7 +15,7 @@ class ListEmpty {
 
   getElement() {
     if (!this._element) {
-      this._element = Util.createElement(this.getTemplate());
+      this._element = createElement(this.getTemplate());
     }
 
     return this._element;

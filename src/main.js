@@ -6,10 +6,10 @@ import Sort from './view/sort.js';
 import TripEventsList from './view/trip-events-list.js';
 import EditForm from './view/edit-form';
 import TripEventsItem from './view/trip-events-item';
-import Util from "./mock/util";
 
 import {generatePoint} from "./mock/point";
 import ListEmpty from "./view/list-empty";
+import {render} from "./utils";
 
 const ITEM_COUNT = 20;
 
@@ -20,10 +20,10 @@ const filterHeader = tripControls.querySelector(`h2:nth-child(2)`);
 const tripEvents = document.querySelector(`.trip-events`);
 const tripSortHeader = tripEvents.querySelector(`h2:first-child`);
 
-Util.render(menuHeader, new Menu().getElement(), `afterend`);
-Util.render(filterHeader, new Filters().getElement(), `afterend`);
-Util.render(tripSortHeader, new Sort().getElement(), `afterend`);
-Util.render(tripEvents, new TripEventsList().getElement(), `beforeend`);
+render(menuHeader, new Menu().getElement(), `afterend`);
+render(filterHeader, new Filters().getElement(), `afterend`);
+render(tripSortHeader, new Sort().getElement(), `afterend`);
+render(tripEvents, new TripEventsList().getElement(), `beforeend`);
 
 const points = [];
 for (let i = 0; i < ITEM_COUNT; i++) {
@@ -33,12 +33,21 @@ points.sort((a, b) => a.startDate.isBefore(b.startDate) ? -1 : 1);
 
 const tripEventsList = tripEvents.querySelector(`.trip-events__list`);
 
+let closedEditFormFlag = true;
+
 const renderPoint = (point) => {
   const editFormElement = new EditForm(point).getElement();
   const evtElement = new TripEventsItem(point).getElement();
 
-  const itemToForm = () => tripEventsList.replaceChild(editFormElement, evtElement);
-  const formToItem = () => tripEventsList.replaceChild(evtElement, editFormElement);
+  const itemToForm = () => {
+    closedEditFormFlag = false;
+    tripEventsList.replaceChild(editFormElement, evtElement);
+  };
+  const formToItem = () => {
+    closedEditFormFlag = true;
+    tripEventsList.replaceChild(evtElement, editFormElement);
+  };
+
   const onEscKeyDown = (evt) => {
     evt.preventDefault();
     if (evt.key === `Escape`) {
@@ -48,25 +57,31 @@ const renderPoint = (point) => {
   };
 
   evtElement.querySelector(`.event__rollup-btn`).addEventListener(`click`, () => {
-    itemToForm();
-    document.addEventListener(`keydown`, onEscKeyDown);
+    if (closedEditFormFlag) {
+      itemToForm();
+      document.addEventListener(`keydown`, onEscKeyDown);
+    }
   });
   editFormElement.addEventListener(`submit`, (evt) => {
     evt.preventDefault();
     formToItem();
     document.removeEventListener(`keydown`, onEscKeyDown);
   });
+  editFormElement.querySelector(`.event__rollup-btn`).addEventListener(`click`, () => {
+    formToItem();
+    document.removeEventListener(`keydown`, onEscKeyDown);
+  });
 
-  Util.render(tripEventsList, evtElement, `beforeend`);
+  render(tripEventsList, evtElement, `beforeend`);
 };
 
 if (points.length === 0) {
-  Util.render(tripEvents, new ListEmpty().getElement(), `beforeend`);
+  render(tripEvents, new ListEmpty().getElement(), `beforeend`);
 } else {
   for (let i = 0; i < points.length; i++) {
     renderPoint(points[i]);
   }
 }
 
-Util.render(tripMain, new TripInfo(points).getElement(), `afterbegin`);
-Util.render(tripMain.querySelector(`.trip-info`), new TripCost(points).getElement(), `beforeend`);
+render(tripMain, new TripInfo(points).getElement(), `afterbegin`);
+render(tripMain.querySelector(`.trip-info`), new TripCost(points).getElement(), `beforeend`);

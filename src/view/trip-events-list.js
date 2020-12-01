@@ -1,4 +1,4 @@
-import Util from "../mock/util";
+import {createElement} from "../utils";
 
 const createTripEventsList = () => {
   return `<ul class="trip-events__list">
@@ -16,7 +16,7 @@ class TripEventsList {
 
   getElement() {
     if (!this._element) {
-      this._element = Util.createElement(this.getTemplate());
+      this._element = createElement(this.getTemplate());
     }
 
     return this._element;

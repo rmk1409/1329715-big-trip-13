@@ -1,6 +1,6 @@
 import {CITIES} from "../mock/point";
-import EditOffers from "./editOffers";
-import Util from "../mock/util";
+import EditOffers from "./edit-offers";
+import {createElement} from "../utils";
 
 const createDestinationlist = () => {
   return CITIES.slice()
@@ -116,6 +116,9 @@ const createEditFormTemplate = (point) => {
 
                   <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
                   <button class="event__reset-btn" type="reset">Cancel</button>
+                  <button class="event__rollup-btn" type="button">
+                    <span class="visually-hidden">Open event</span>
+                  </button>
                 </header>
                 <section class="event__details">
                   <section class="event__section  event__section--offers">
@@ -152,7 +155,7 @@ class EditForm {
 
   getElement() {
     if (!this._element) {
-      this._element = Util.createElement(this.getTemplate());
+      this._element = createElement(this.getTemplate());
     }
 
     return this._element;
