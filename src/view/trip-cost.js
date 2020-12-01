@@ -1,4 +1,4 @@
-import Util from "../mock/util";
+import {createElement} from "../utils";
 
 const createTripCostTemplate = (points) => {
   const total = points.reduce((acc, curVal) => acc + curVal.price, 0);
@@ -20,7 +20,7 @@ class TripCost {
 
   getElement() {
     if (!this._element) {
-      this._element = Util.createElement(this.getTemplate());
+      this._element = createElement(this.getTemplate());
     }
 
     return this._element;

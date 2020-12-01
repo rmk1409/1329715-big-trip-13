@@ -1,4 +1,4 @@
-import Util from "../mock/util";
+import {createElement} from "../utils";
 
 const createMenuTemplate = () => {
   return `<nav class="trip-controls__trip-tabs  trip-tabs">
@@ -18,7 +18,7 @@ class Menu {
 
   getElement() {
     if (!this._element) {
-      this._element = Util.createElement(this.getTemplate());
+      this._element = createElement(this.getTemplate());
     }
 
     return this._element;
