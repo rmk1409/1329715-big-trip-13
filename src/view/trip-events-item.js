@@ -1,5 +1,6 @@
 import Offer from "./offer";
-import {createElement, getDateDifference} from "../utils";
+import {getDateDifference} from "../utils";
+import AbstractView from "./abstract-view";
 
 const createTripEventsItemTemplate = (point) => {
   const {startDate, type, destination, endDate, price, offers, isFavorite} = point;
@@ -43,26 +44,14 @@ const createTripEventsItemTemplate = (point) => {
             </li>`;
 };
 
-class TripEventsItem {
+class TripEventsItem extends AbstractView {
   constructor(point) {
+    super();
     this._point = point;
-    this._element = null;
   }
 
   getTemplate() {
     return createTripEventsItemTemplate(this._point);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
 

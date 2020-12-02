@@ -1,5 +1,5 @@
 import {OFFERS} from "../mock/offer";
-import {createElement} from "../utils";
+import AbstractView from "./abstract-view";
 
 const getEditOffers = ({id, offers: pointOffers}) => {
   return OFFERS.map((curOffer) => {
@@ -15,26 +15,14 @@ const getEditOffers = ({id, offers: pointOffers}) => {
   }).join(``);
 };
 
-class EditOffers {
+class EditOffers extends AbstractView {
   constructor(point) {
+    super();
     this._point = point;
-    this._element = null;
   }
 
   getTemplate() {
     return getEditOffers(this._point);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
 

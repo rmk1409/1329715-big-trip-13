@@ -1,6 +1,6 @@
 import {CITIES} from "../mock/point";
 import EditOffers from "./edit-offers";
-import {createElement} from "../utils";
+import AbstractView from "./abstract-view";
 
 const createDestinationlist = () => {
   return CITIES.slice()
@@ -143,26 +143,14 @@ const createEditFormTemplate = (point) => {
             </li>`;
 };
 
-class EditForm {
+class EditForm extends AbstractView {
   constructor(point) {
+    super();
     this._point = point;
-    this._element = null;
   }
 
   getTemplate() {
     return createEditFormTemplate(this._point);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
 

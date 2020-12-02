@@ -1,4 +1,4 @@
-import {createElement} from "../utils";
+import AbstractView from "./abstract-view";
 
 const POINT_COUNT_FOR_DOTS_FORMAT = 3;
 
@@ -26,26 +26,14 @@ const createTripInfoTemplate = (points) => {
           </section>`;
 };
 
-class TripInfo {
+class TripInfo extends AbstractView {
   constructor(points) {
+    super();
     this._points = points;
-    this._element = null;
   }
 
   getTemplate() {
     return createTripInfoTemplate(this._points);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
 
