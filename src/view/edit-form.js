@@ -1,6 +1,6 @@
 import {CITIES} from "../mock/point";
 import EditOffers from "./edit-offers";
-import {createElement} from "../utils";
+import AbstractView from "./abstract-view";
 
 const createDestinationlist = () => {
   return CITIES.slice()
@@ -143,26 +143,36 @@ const createEditFormTemplate = (point) => {
             </li>`;
 };
 
-class EditForm {
+class EditForm extends AbstractView {
   constructor(point) {
+    super();
     this._point = point;
-    this._element = null;
+    this._submitHandler = this._submitHandler.bind(this);
+    this._clickArrowHandler = this._clickArrowHandler.bind(this);
+  }
+
+  _submitHandler(evt) {
+    evt.preventDefault();
+    this._cb.submit();
+  }
+
+  _clickArrowHandler(evt) {
+    evt.preventDefault();
+    this._cb.click();
+  }
+
+  setSubmitHandler(cb) {
+    this._cb.submit = cb;
+    this.getElement().addEventListener(`submit`, this._submitHandler);
+  }
+
+  setClickArrowHandler(cb) {
+    this._cb.click = cb;
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._clickArrowHandler);
   }
 
   getTemplate() {
     return createEditFormTemplate(this._point);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
 

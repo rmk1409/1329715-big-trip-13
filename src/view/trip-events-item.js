@@ -1,5 +1,6 @@
 import Offer from "./offer";
-import {createElement, getDateDifference} from "../utils";
+import AbstractView from "./abstract-view";
+import {getDateDifference} from "../utils/point";
 
 const createTripEventsItemTemplate = (point) => {
   const {startDate, type, destination, endDate, price, offers, isFavorite} = point;
@@ -43,26 +44,27 @@ const createTripEventsItemTemplate = (point) => {
             </li>`;
 };
 
-class TripEventsItem {
+class TripEventsItem extends AbstractView {
   constructor(point) {
+    super();
     this._point = point;
-    this._element = null;
+    this._clickArrowHandler = this._clickArrowHandler.bind(this);
+  }
+
+  _clickArrowHandler(evt) {
+    evt.preventDefault();
+    this._cb.click();
   }
 
   getTemplate() {
     return createTripEventsItemTemplate(this._point);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+  setClickArrowHandler(cb) {
+    this._cb.click = cb;
+    this.getElement()
+      .querySelector(`.event__rollup-btn`)
+      .addEventListener(`click`, this._clickArrowHandler);
   }
 }
 

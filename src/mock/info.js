@@ -1,4 +1,4 @@
-import {getRandomValueOfArray} from "../utils";
+import {getRandomValueOfArray} from "../utils/common";
 
 const MAX_DESCRIPTION_LENGTH = 5;
 const MAX_PHOTO_COUNT = 7;
