@@ -9,7 +9,7 @@ import TripEventsItem from './view/trip-events-item';
 
 import {generatePoint} from "./mock/point";
 import ListEmpty from "./view/list-empty";
-import {render} from "./utils";
+import {render, replace} from "./utils/render";
 
 const ITEM_COUNT = 20;
 
@@ -20,10 +20,10 @@ const filterHeader = tripControls.querySelector(`h2:nth-child(2)`);
 const tripEvents = document.querySelector(`.trip-events`);
 const tripSortHeader = tripEvents.querySelector(`h2:first-child`);
 
-render(menuHeader, new Menu().getElement(), `afterend`);
-render(filterHeader, new Filters().getElement(), `afterend`);
-render(tripSortHeader, new Sort().getElement(), `afterend`);
-render(tripEvents, new TripEventsList().getElement(), `beforeend`);
+render(menuHeader, new Menu(), `afterend`);
+render(filterHeader, new Filters(), `afterend`);
+render(tripSortHeader, new Sort(), `afterend`);
+render(tripEvents, new TripEventsList(), `beforeend`);
 
 const points = [];
 for (let i = 0; i < ITEM_COUNT; i++) {
@@ -36,16 +36,16 @@ const tripEventsList = tripEvents.querySelector(`.trip-events__list`);
 let closedEditFormFlag = true;
 
 const renderPoint = (point) => {
-  const editFormElement = new EditForm(point).getElement();
-  const evtElement = new TripEventsItem(point).getElement();
+  const editFormComponent = new EditForm(point);
+  const evtComponent = new TripEventsItem(point);
 
   const itemToForm = () => {
     closedEditFormFlag = false;
-    tripEventsList.replaceChild(editFormElement, evtElement);
+    replace(editFormComponent, evtComponent);
   };
   const formToItem = () => {
     closedEditFormFlag = true;
-    tripEventsList.replaceChild(evtElement, editFormElement);
+    replace(evtComponent, editFormComponent);
   };
 
   const onEscKeyDown = (evt) => {
@@ -56,32 +56,33 @@ const renderPoint = (point) => {
     }
   };
 
-  evtElement.querySelector(`.event__rollup-btn`).addEventListener(`click`, () => {
+  evtComponent.setClickArrowHandler(() => {
     if (closedEditFormFlag) {
       itemToForm();
       document.addEventListener(`keydown`, onEscKeyDown);
     }
   });
-  editFormElement.addEventListener(`submit`, (evt) => {
-    evt.preventDefault();
-    formToItem();
-    document.removeEventListener(`keydown`, onEscKeyDown);
-  });
-  editFormElement.querySelector(`.event__rollup-btn`).addEventListener(`click`, () => {
+
+  editFormComponent.setSubmitHandler(() => {
     formToItem();
     document.removeEventListener(`keydown`, onEscKeyDown);
   });
 
-  render(tripEventsList, evtElement, `beforeend`);
+  editFormComponent.setClickArrowHandler(() => {
+    formToItem();
+    document.removeEventListener(`keydown`, onEscKeyDown);
+  });
+
+  render(tripEventsList, evtComponent, `beforeend`);
 };
 
 if (points.length === 0) {
-  render(tripEvents, new ListEmpty().getElement(), `beforeend`);
+  render(tripEvents, new ListEmpty(), `beforeend`);
 } else {
   for (let i = 0; i < points.length; i++) {
     renderPoint(points[i]);
   }
 }
 
-render(tripMain, new TripInfo(points).getElement(), `afterbegin`);
-render(tripMain.querySelector(`.trip-info`), new TripCost(points).getElement(), `beforeend`);
+render(tripMain, new TripInfo(points), `afterbegin`);
+render(tripMain.querySelector(`.trip-info`), new TripCost(points), `beforeend`);

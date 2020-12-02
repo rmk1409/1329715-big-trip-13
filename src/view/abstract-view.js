@@ -1,4 +1,4 @@
-import {createElement} from "../utils";
+import {createElement} from "../utils/render";
 
 class AbstractView {
   constructor() {
@@ -7,6 +7,7 @@ class AbstractView {
     }
 
     this._element = null;
+    this._cb = {};
   }
 
   getTemplate() {

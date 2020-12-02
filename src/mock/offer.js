@@ -1,4 +1,4 @@
-import {getRandomValueOfArray} from "../utils";
+import {getRandomValueOfArray} from "../utils/common";
 
 const MAX_OFFER_COUNT = 5;
 
