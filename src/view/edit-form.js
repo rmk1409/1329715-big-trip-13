@@ -168,7 +168,8 @@ class EditForm extends AbstractView {
 
   setClickArrowHandler(cb) {
     this._cb.click = cb;
-    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._clickArrowHandler);
+    this.getElement().querySelector(`.event__rollup-btn`)
+      .addEventListener(`click`, this._clickArrowHandler);
   }
 
   getTemplate() {
