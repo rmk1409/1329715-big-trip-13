@@ -3,7 +3,7 @@ import TripEventsItem from '../view/trip-events-item';
 import {render, replace} from '../utils/render';
 
 export default class Point {
-  constructor(pointsListContainer) {
+  constructor(pointsListContainer, closeOpenFormCB) {
     this._pointsListContainer = pointsListContainer;
     this._pointData = null;
 
@@ -12,6 +12,8 @@ export default class Point {
     this._clickFormArrowHandler = this._clickFormArrowHandler.bind(this);
     this._onEscKeyDown = this._onEscKeyDown.bind(this);
     this._clickFavoriteHandler = this._clickFavoriteHandler.bind(this);
+
+    this._openFormCB = closeOpenFormCB;
   }
 
   initOrUpdate(point) {
@@ -42,30 +44,33 @@ export default class Point {
   _clickArrowHandler() {
     this._pointToForm();
     document.addEventListener(`keydown`, this._onEscKeyDown);
+    this._openFormCB(this._pointData.id);
   }
 
   _submitHandler() {
-    this._formToPoint();
+    this.formToPoint();
     document.removeEventListener(`keydown`, this._onEscKeyDown);
+    this._openFormCB();
   }
 
   _clickFormArrowHandler() {
-    this._formToPoint();
+    this.formToPoint();
     document.removeEventListener(`keydown`, this._onEscKeyDown);
+    this._openFormCB();
   }
 
   _pointToForm() {
     replace(this._editFormComponent, this._evtComponent);
   }
 
-  _formToPoint() {
+  formToPoint() {
     replace(this._evtComponent, this._editFormComponent);
   }
 
   _onEscKeyDown(evt) {
     evt.preventDefault();
     if (evt.key === `Escape`) {
-      this._formToPoint();
+      this.formToPoint();
       document.removeEventListener(`keydown`, this._onEscKeyDown);
     }
   }

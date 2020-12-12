@@ -24,6 +24,9 @@ export default class Trip {
     this._tripCostView = null;
 
     this._pointPresenters = new Map();
+    this._openedPointId = null;
+
+    this._closeOpenFormCB = this._closeOpenFormCB.bind(this);
   }
 
   init(points) {
@@ -76,7 +79,7 @@ export default class Trip {
   }
 
   _renderPoint(point, pointsListContainer) {
-    const presenter = new Point(pointsListContainer);
+    const presenter = new Point(pointsListContainer, this._closeOpenFormCB);
     presenter.initOrUpdate(point);
     this._pointPresenters.set(point.id, presenter);
   }
@@ -92,5 +95,13 @@ export default class Trip {
   _renderTripCost() {
     const tripInfo = this._tripInfoContainer.querySelector(`.trip-info`);
     render(tripInfo, this._tripCostView, RenderPosition.BEFORE_END);
+  }
+
+  _closeOpenFormCB(openedPointId) {
+    if (this._openedPointId) {
+      this._pointPresenters.get(this._openedPointId)
+        .formToPoint();
+    }
+    this._openedPointId = openedPointId;
   }
 }
