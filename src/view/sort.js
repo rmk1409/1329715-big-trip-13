@@ -30,6 +30,22 @@ const createSortTemplate = () => {
 };
 
 class Sort extends AbstractView {
+  constructor() {
+    super();
+
+    this._sortChangeHandler = this._sortChangeHandler.bind(this);
+  }
+
+  _sortChangeHandler(evt) {
+    evt.preventDefault();
+    this._cb.sortChange(evt.target.htmlFor);
+  }
+
+  setSortChangeHandler(cb) {
+    this._cb.sortChange = cb;
+    this.getElement().addEventListener(`click`, this._sortChangeHandler);
+  }
+
   getTemplate() {
     return createSortTemplate();
   }

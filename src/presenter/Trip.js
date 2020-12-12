@@ -8,6 +8,12 @@ import {render, RenderPosition} from '../utils/render';
 import ListEmpty from '../view/list-empty';
 import Point from './Point';
 
+const SortMode = {
+  DEFAULT: `sort-day`,
+  TIME: `sort-time`,
+  PRICE: `sort-price`
+};
+
 export default class Trip {
   constructor(tripInfoContainer, pointsInfoContainer) {
     this._tripInfoContainer = tripInfoContainer;
@@ -27,6 +33,8 @@ export default class Trip {
     this._openedPointId = null;
 
     this._closeOpenFormCB = this._closeOpenFormCB.bind(this);
+    this._sortChangeHandler = this._sortChangeHandler.bind(this);
+    this._currentSortMode = SortMode.DEFAULT;
   }
 
   init(points) {
@@ -47,11 +55,8 @@ export default class Trip {
     this._renderTripInfo();
     this._renderTripCost();
 
-    if (this._points.length) {
-      this._renderPoints();
-    } else {
-      this._renderNoPoints();
-    }
+    this._sortByDay();
+    this._renderPoints();
   }
 
   _renderMenu() {
@@ -65,17 +70,64 @@ export default class Trip {
   }
 
   _renderSort() {
+    this._sortView.setSortChangeHandler(this._sortChangeHandler);
     const tripSortHeader = this._pointsInfoContainer.querySelector(`h2:first-child`);
     render(tripSortHeader, this._sortView, RenderPosition.AFTER_END);
+  }
+
+  _sortByDay() {
+    this._points.sort((a, b) => a.startDate.isBefore(b.startDate) ? -1 : 1);
+  }
+
+  _sortByTime() {
+    this._points.sort((a, b) => a.endDate.diff(a.startDate) - b.endDate.diff(b.startDate));
+  }
+
+  _sortByPrice() {
+    this._points.sort((a, b) => a.price - b.price);
+  }
+
+  _sortChangeHandler(data) {
+    if (this._isAnotherMode(data)) {
+      this._currentSortMode = data;
+
+      switch (data) {
+        case SortMode.DEFAULT:
+          this._sortByDay();
+          break;
+        case SortMode.TIME:
+          this._sortByTime();
+          break;
+        case SortMode.PRICE:
+          this._sortByPrice();
+          break;
+      }
+
+      this._renderPoints();
+    }
+  }
+
+  _isAnotherMode(data) {
+    return data !== this._currentSortMode;
   }
 
   _renderTripEventsList() {
     render(this._pointsInfoContainer, this._pointListView, RenderPosition.BEFORE_END);
   }
 
+  _clearPointsList() {
+    this._pointsInfoContainer.querySelector(`.trip-events__list`).innerHTML = ``;
+    this._pointPresenters.clear();
+  }
+
   _renderPoints() {
-    const pointsListContainer = this._pointsInfoContainer.querySelector(`.trip-events__list`);
-    this._points.forEach((point) => this._renderPoint(point, pointsListContainer));
+    this._clearPointsList();
+    if (this._points.length) {
+      const pointsListContainer = this._pointsInfoContainer.querySelector(`.trip-events__list`);
+      this._points.forEach((point) => this._renderPoint(point, pointsListContainer));
+    } else {
+      this._renderNoPoints();
+    }
   }
 
   _renderPoint(point, pointsListContainer) {
