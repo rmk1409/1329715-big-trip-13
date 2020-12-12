@@ -53,4 +53,4 @@ const replace = (newChild, oldChild) => {
   parent.replaceChild(newChild, oldChild);
 };
 
-export {render, createElement, replace};
+export {render, createElement, replace, RenderPosition};
