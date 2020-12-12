@@ -22,6 +22,8 @@ export default class Trip {
     this._points = null;
     this._tripInfoView = null;
     this._tripCostView = null;
+
+    this._pointPresenters = new Map();
   }
 
   init(points) {
@@ -74,7 +76,9 @@ export default class Trip {
   }
 
   _renderPoint(point, pointsListContainer) {
-    new Point(pointsListContainer).init(point);
+    const presenter = new Point(pointsListContainer);
+    presenter.initOrUpdate(point);
+    this._pointPresenters.set(point.id, presenter);
   }
 
   _renderNoPoints() {

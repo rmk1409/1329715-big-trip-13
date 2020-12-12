@@ -49,11 +49,17 @@ class TripEventsItem extends AbstractView {
     super();
     this._point = point;
     this._clickArrowHandler = this._clickArrowHandler.bind(this);
+    this._clickFavoriteHandler = this._clickFavoriteHandler.bind(this);
   }
 
   _clickArrowHandler(evt) {
     evt.preventDefault();
-    this._cb.click();
+    this._cb.clickArrow();
+  }
+
+  _clickFavoriteHandler(evt) {
+    evt.preventDefault();
+    this._cb.clickFavorite();
   }
 
   getTemplate() {
@@ -61,10 +67,15 @@ class TripEventsItem extends AbstractView {
   }
 
   setClickArrowHandler(cb) {
-    this._cb.click = cb;
-    this.getElement()
-      .querySelector(`.event__rollup-btn`)
+    this._cb.clickArrow = cb;
+    this.getElement().querySelector(`.event__rollup-btn`)
       .addEventListener(`click`, this._clickArrowHandler);
+  }
+
+  setClickFavoriteHandrel(cb) {
+    this._cb.clickFavorite = cb;
+    this.getElement().querySelector(`.event__favorite-btn`)
+      .addEventListener(`click`, this._clickFavoriteHandler);
   }
 }
 
