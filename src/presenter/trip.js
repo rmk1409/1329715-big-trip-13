@@ -34,6 +34,7 @@ export default class Trip {
     this._toggleFormHandler = this._toggleFormHandler.bind(this);
     this._sortChangeHandler = this._sortChangeHandler.bind(this);
     this._onEscKeyDown = this._onEscKeyDown.bind(this);
+    this._updateBoardData = this._updateBoardData.bind(this);
     this._currentSortMode = SortMode.DEFAULT;
   }
 
@@ -132,8 +133,13 @@ export default class Trip {
   }
 
   _renderPoint(point, pointsListContainer) {
-    const presenter = new Point(pointsListContainer, this._toggleFormHandler);
+    const presenter = new Point(pointsListContainer, this._updateBoardData);
     presenter.initOrUpdate(point);
+  }
+
+  _updateBoardData(updatePoint) {
+    const index = this._points.findIndex((point) => point.id === updatePoint.id);
+    this._points[index] = updatePoint;
   }
 
   _renderNoPoints() {
