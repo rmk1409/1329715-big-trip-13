@@ -10,7 +10,6 @@ export default class Point {
     this._clickArrowHandler = this._clickArrowHandler.bind(this);
     this._submitHandler = this._submitHandler.bind(this);
     this._clickFormArrowHandler = this._clickFormArrowHandler.bind(this);
-    this._onEscKeyDown = this._onEscKeyDown.bind(this);
     this._clickFavoriteHandler = this._clickFavoriteHandler.bind(this);
 
     this._toggleFormHandler = toggleFormHandler;
@@ -43,35 +42,23 @@ export default class Point {
 
   _clickArrowHandler() {
     this._pointToForm();
-    document.addEventListener(`keydown`, this._onEscKeyDown);
-    this._toggleFormHandler(this._pointData.id);
   }
 
   _submitHandler() {
     this.formToPoint();
-    document.removeEventListener(`keydown`, this._onEscKeyDown);
-    this._toggleFormHandler();
   }
 
   _clickFormArrowHandler() {
     this.formToPoint();
-    document.removeEventListener(`keydown`, this._onEscKeyDown);
-    this._toggleFormHandler();
   }
 
   _pointToForm() {
+    this._toggleFormHandler(this);
     replace(this._editFormComponent, this._evtComponent);
   }
 
   formToPoint() {
+    this._toggleFormHandler();
     replace(this._evtComponent, this._editFormComponent);
-  }
-
-  _onEscKeyDown(evt) {
-    evt.preventDefault();
-    if (evt.key === `Escape`) {
-      this.formToPoint();
-      document.removeEventListener(`keydown`, this._onEscKeyDown);
-    }
   }
 }

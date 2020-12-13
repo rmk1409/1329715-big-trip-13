@@ -11,7 +11,7 @@ import Point from './point';
 const SortMode = {
   DEFAULT: `sort-day`,
   TIME: `sort-time`,
-  PRICE: `sort-price`
+  PRICE: `sort-price`,
 };
 
 export default class Trip {
@@ -29,11 +29,11 @@ export default class Trip {
     this._tripInfoView = null;
     this._tripCostView = null;
 
-    this._pointPresenters = new Map();
-    this._openedPointId = null;
+    this._openedPointPresenter = null;
 
     this._toggleFormHandler = this._toggleFormHandler.bind(this);
     this._sortChangeHandler = this._sortChangeHandler.bind(this);
+    this._onEscKeyDown = this._onEscKeyDown.bind(this);
     this._currentSortMode = SortMode.DEFAULT;
   }
 
@@ -117,7 +117,8 @@ export default class Trip {
 
   _clearPointsList() {
     this._pointsInfoContainer.querySelector(`.trip-events__list`).innerHTML = ``;
-    this._pointPresenters.clear();
+    this._openedPointPresenter = null;
+    document.removeEventListener(`keydown`, this._onEscKeyDown);
   }
 
   _renderPoints() {
@@ -133,7 +134,6 @@ export default class Trip {
   _renderPoint(point, pointsListContainer) {
     const presenter = new Point(pointsListContainer, this._toggleFormHandler);
     presenter.initOrUpdate(point);
-    this._pointPresenters.set(point.id, presenter);
   }
 
   _renderNoPoints() {
@@ -149,11 +149,22 @@ export default class Trip {
     render(tripInfo, this._tripCostView, RenderPosition.BEFORE_END);
   }
 
-  _toggleFormHandler(openedPointId) {
-    if (this._openedPointId) {
-      this._pointPresenters.get(this._openedPointId)
-        .formToPoint();
+  _toggleFormHandler(newOpenedPresenter) {
+    if (newOpenedPresenter) {
+      if (this._openedPointPresenter) {
+        this._openedPointPresenter.formToPoint();
+        document.removeEventListener(`keydown`, this._onEscKeyDown);
+      }
+      document.addEventListener(`keydown`, this._onEscKeyDown);
     }
-    this._openedPointId = openedPointId;
+    this._openedPointPresenter = newOpenedPresenter;
+  }
+
+  _onEscKeyDown(evt) {
+    if (evt.key === `Escape`) {
+      evt.preventDefault();
+      this._openedPointPresenter.formToPoint();
+      document.removeEventListener(`keydown`, this._onEscKeyDown);
+    }
   }
 }
