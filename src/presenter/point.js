@@ -3,20 +3,23 @@ import TripEventsItem from '../view/trip-events-item';
 import {render, replace} from '../utils/render';
 
 export default class Point {
-  constructor(pointsListContainer, closeOpenFormCB) {
+  constructor(pointsListContainer, updateBoardData) {
     this._pointsListContainer = pointsListContainer;
     this._pointData = null;
 
     this._clickArrowHandler = this._clickArrowHandler.bind(this);
     this._submitHandler = this._submitHandler.bind(this);
     this._clickFormArrowHandler = this._clickFormArrowHandler.bind(this);
-    this._onEscKeyDown = this._onEscKeyDown.bind(this);
     this._clickFavoriteHandler = this._clickFavoriteHandler.bind(this);
 
-    this._openFormCB = closeOpenFormCB;
+    this._updateBoardData = updateBoardData;
   }
 
   initOrUpdate(point) {
+    if (this._pointData) {
+      this._updateBoardData(point);
+    }
+
     this._pointData = point;
 
     const previousEvtComponent = this._evtComponent;
@@ -25,7 +28,7 @@ export default class Point {
     this._editFormComponent = new EditForm(point);
 
     this._evtComponent.setClickArrowHandler(this._clickArrowHandler);
-    this._evtComponent.setClickFavoriteHandrel(this._clickFavoriteHandler);
+    this._evtComponent.setClickFavoriteHandler(this._clickFavoriteHandler);
     this._editFormComponent.setSubmitHandler(this._submitHandler);
     this._editFormComponent.setClickArrowHandler(this._clickFormArrowHandler);
 
@@ -43,35 +46,23 @@ export default class Point {
 
   _clickArrowHandler() {
     this._pointToForm();
-    document.addEventListener(`keydown`, this._onEscKeyDown);
-    this._openFormCB(this._pointData.id);
   }
 
   _submitHandler() {
     this.formToPoint();
-    document.removeEventListener(`keydown`, this._onEscKeyDown);
-    this._openFormCB();
   }
 
   _clickFormArrowHandler() {
     this.formToPoint();
-    document.removeEventListener(`keydown`, this._onEscKeyDown);
-    this._openFormCB();
   }
 
   _pointToForm() {
+    this._toggleFormHandler(this);
     replace(this._editFormComponent, this._evtComponent);
   }
 
   formToPoint() {
+    this._toggleFormHandler();
     replace(this._evtComponent, this._editFormComponent);
-  }
-
-  _onEscKeyDown(evt) {
-    evt.preventDefault();
-    if (evt.key === `Escape`) {
-      this.formToPoint();
-      document.removeEventListener(`keydown`, this._onEscKeyDown);
-    }
   }
 }

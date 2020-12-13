@@ -6,12 +6,12 @@ import TripInfo from '../view/trip-info';
 import TripCost from '../view/trip-cost';
 import {render, RenderPosition} from '../utils/render';
 import ListEmpty from '../view/list-empty';
-import Point from './Point';
+import Point from './point';
 
 const SortMode = {
   DEFAULT: `sort-day`,
   TIME: `sort-time`,
-  PRICE: `sort-price`
+  PRICE: `sort-price`,
 };
 
 export default class Trip {
@@ -29,11 +29,12 @@ export default class Trip {
     this._tripInfoView = null;
     this._tripCostView = null;
 
-    this._pointPresenters = new Map();
-    this._openedPointId = null;
+    this._openedPointPresenter = null;
 
-    this._closeOpenFormCB = this._closeOpenFormCB.bind(this);
+    this._toggleFormHandler = this._toggleFormHandler.bind(this);
     this._sortChangeHandler = this._sortChangeHandler.bind(this);
+    this._onEscKeyDown = this._onEscKeyDown.bind(this);
+    this._updateBoardData = this._updateBoardData.bind(this);
     this._currentSortMode = SortMode.DEFAULT;
   }
 
@@ -117,7 +118,8 @@ export default class Trip {
 
   _clearPointsList() {
     this._pointsInfoContainer.querySelector(`.trip-events__list`).innerHTML = ``;
-    this._pointPresenters.clear();
+    this._openedPointPresenter = null;
+    document.removeEventListener(`keydown`, this._onEscKeyDown);
   }
 
   _renderPoints() {
@@ -131,9 +133,13 @@ export default class Trip {
   }
 
   _renderPoint(point, pointsListContainer) {
-    const presenter = new Point(pointsListContainer, this._closeOpenFormCB);
+    const presenter = new Point(pointsListContainer, this._updateBoardData);
     presenter.initOrUpdate(point);
-    this._pointPresenters.set(point.id, presenter);
+  }
+
+  _updateBoardData(updatePoint) {
+    const index = this._points.findIndex((point) => point.id === updatePoint.id);
+    this._points[index] = updatePoint;
   }
 
   _renderNoPoints() {
@@ -149,11 +155,22 @@ export default class Trip {
     render(tripInfo, this._tripCostView, RenderPosition.BEFORE_END);
   }
 
-  _closeOpenFormCB(openedPointId) {
-    if (this._openedPointId) {
-      this._pointPresenters.get(this._openedPointId)
-        .formToPoint();
+  _toggleFormHandler(newOpenedPresenter) {
+    if (newOpenedPresenter) {
+      if (this._openedPointPresenter) {
+        this._openedPointPresenter.formToPoint();
+        document.removeEventListener(`keydown`, this._onEscKeyDown);
+      }
+      document.addEventListener(`keydown`, this._onEscKeyDown);
     }
-    this._openedPointId = openedPointId;
+    this._openedPointPresenter = newOpenedPresenter;
+  }
+
+  _onEscKeyDown(evt) {
+    if (evt.key === `Escape`) {
+      evt.preventDefault();
+      this._openedPointPresenter.formToPoint();
+      document.removeEventListener(`keydown`, this._onEscKeyDown);
+    }
   }
 }

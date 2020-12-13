@@ -72,7 +72,7 @@ class TripEventsItem extends AbstractView {
       .addEventListener(`click`, this._clickArrowHandler);
   }
 
-  setClickFavoriteHandrel(cb) {
+  setClickFavoriteHandler(cb) {
     this._cb.clickFavorite = cb;
     this.getElement().querySelector(`.event__favorite-btn`)
       .addEventListener(`click`, this._clickFavoriteHandler);
