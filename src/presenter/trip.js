@@ -6,7 +6,7 @@ import TripInfo from '../view/trip-info';
 import TripCost from '../view/trip-cost';
 import {render, RenderPosition} from '../utils/render';
 import ListEmpty from '../view/list-empty';
-import Point from './Point';
+import Point from './point';
 
 const SortMode = {
   DEFAULT: `sort-day`,
@@ -32,7 +32,7 @@ export default class Trip {
     this._pointPresenters = new Map();
     this._openedPointId = null;
 
-    this._closeOpenFormCB = this._closeOpenFormCB.bind(this);
+    this._toggleFormHandler = this._toggleFormHandler.bind(this);
     this._sortChangeHandler = this._sortChangeHandler.bind(this);
     this._currentSortMode = SortMode.DEFAULT;
   }
@@ -131,7 +131,7 @@ export default class Trip {
   }
 
   _renderPoint(point, pointsListContainer) {
-    const presenter = new Point(pointsListContainer, this._closeOpenFormCB);
+    const presenter = new Point(pointsListContainer, this._toggleFormHandler);
     presenter.initOrUpdate(point);
     this._pointPresenters.set(point.id, presenter);
   }
@@ -149,7 +149,7 @@ export default class Trip {
     render(tripInfo, this._tripCostView, RenderPosition.BEFORE_END);
   }
 
-  _closeOpenFormCB(openedPointId) {
+  _toggleFormHandler(openedPointId) {
     if (this._openedPointId) {
       this._pointPresenters.get(this._openedPointId)
         .formToPoint();
