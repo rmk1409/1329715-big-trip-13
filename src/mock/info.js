@@ -1,7 +1,10 @@
 import {getRandomValueOfArray} from "../utils/common";
+import {CITIES} from "./point";
 
 const MAX_DESCRIPTION_LENGTH = 5;
 const MAX_PHOTO_COUNT = 7;
+
+let DESTINATION_INFO = null;
 
 const DESCRIPTIONS = [
   `Lorem ipsum dolor sit amet, consectetur adipiscing elit.`,
@@ -14,7 +17,7 @@ const DESCRIPTIONS = [
   `Sed sed nisi sed augue convallis suscipit in sed felis.`,
   `Aliquam erat volutpat.`,
   `Nunc fermentum tortor ac porta dapibus.`,
-  `In rutrum ac purus sit amet tempus.`
+  `In rutrum ac purus sit amet tempus.`,
 ];
 
 const getDescription = () => {
@@ -35,11 +38,21 @@ const getPhoto = () => {
   return photos;
 };
 
-const getInfo = () => {
-  return {
-    description: getDescription(),
-    photos: getPhoto()
-  };
+const initInfo = () => {
+  DESTINATION_INFO = new Map();
+  CITIES.forEach((destination) => {
+    DESTINATION_INFO.set(destination, {
+      description: getDescription(),
+      photos: getPhoto(),
+    });
+  });
+};
+
+const getInfo = (destination) => {
+  if (!DESTINATION_INFO) {
+    initInfo();
+  }
+  return DESTINATION_INFO.get(destination);
 };
 
 export {getInfo};

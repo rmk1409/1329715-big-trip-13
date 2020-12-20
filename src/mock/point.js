@@ -26,6 +26,9 @@ const setDates = (point) => {
 const setOffers = (point) => {
   point.offers = getOffers(point.type);
 };
+const setInfo = (point) => {
+  point.info = getInfo(point.destination);
+};
 
 const createIdGenerator = () => {
   let i = 1;
@@ -39,10 +42,10 @@ const generatePoint = () => {
     id: getNextId(),
     type: getRandomValueOfArray(TYPES),
     destination: getRandomValueOfArray(CITIES),
-    info: getInfo(),
     isFavorite: Boolean(getRandomNumber(0, 1)),
     price: getRandomNumber(MIN_POINT_PRICE, MAX_POINT_PRICE),
   };
+  setInfo(point);
   setOffers(point);
   setDates(point);
   return point;
