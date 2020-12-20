@@ -133,7 +133,7 @@ export default class Trip {
   }
 
   _renderPoint(point, pointsListContainer) {
-    const presenter = new Point(pointsListContainer, this._updateBoardData);
+    const presenter = new Point(pointsListContainer, this._toggleFormHandler, this._updateBoardData);
     presenter.initOrUpdate(point);
   }
 

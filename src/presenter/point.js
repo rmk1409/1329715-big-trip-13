@@ -3,7 +3,7 @@ import TripEventsItem from '../view/trip-events-item';
 import {render, replace} from '../utils/render';
 
 export default class Point {
-  constructor(pointsListContainer, updateBoardData) {
+  constructor(pointsListContainer, toggleFormHandler, updateBoardData) {
     this._pointsListContainer = pointsListContainer;
     this._pointData = null;
 
@@ -12,6 +12,7 @@ export default class Point {
     this._clickFormArrowHandler = this._clickFormArrowHandler.bind(this);
     this._clickFavoriteHandler = this._clickFavoriteHandler.bind(this);
 
+    this._toggleFormHandler = toggleFormHandler;
     this._updateBoardData = updateBoardData;
   }
 
