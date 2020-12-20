@@ -1,6 +1,7 @@
 import {CITIES, TYPES} from "../mock/point";
 import EditOffers from "./edit-offers";
 import SmartView from "./smart-view";
+import {getAvailableOffers} from "../mock/offer";
 
 const createDestinationlist = () => {
   return CITIES.slice()
@@ -27,7 +28,6 @@ const createEditFormTemplate = (point) => {
     destination = ``,
     startDate, endDate,
     price = ``,
-    offers = [],
     info: {description = ``, photos = []},
   } = point;
 
@@ -86,7 +86,7 @@ const createEditFormTemplate = (point) => {
                 </header>
                 <section class="event__details">
                   <section class="event__section  event__section--offers">
-                    ${offers.length > 0 ? ` <h3 class="event__section-title  event__section-title--offers">Offers</h3>
+                    ${getAvailableOffers(type).length > 0 ? ` <h3 class="event__section-title  event__section-title--offers">Offers</h3>
                      <div class="event__available-offers">
                             ${new EditOffers(point).getTemplate()}
                     </div>` : ``}

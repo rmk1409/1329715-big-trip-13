@@ -1,8 +1,9 @@
-import {OFFERS} from "../mock/offer";
 import AbstractView from "./abstract-view";
+import {getAvailableOffers} from "../mock/offer";
 
-const getEditOffers = ({id, offers: pointOffers}) => {
-  return OFFERS.map((curOffer) => {
+const getEditOffers = (point) => {
+  const {id, offers: pointOffers} = point;
+  return getAvailableOffers(point.type).map((curOffer) => {
     const {type, name, price} = curOffer;
     return `<div class="event__offer-selector">
               <input class="event__offer-checkbox  visually-hidden" id="event-offer-${type}-${id}" type="checkbox" name="event-offer-${type}" ${pointOffers.indexOf(curOffer) === -1 ? `` : `checked`}>
