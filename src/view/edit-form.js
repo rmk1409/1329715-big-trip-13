@@ -1,6 +1,7 @@
 import {CITIES} from "../mock/point";
 import EditOffers from "./edit-offers";
 import AbstractView from "./abstract-view";
+import SmartView from "./smart-view";
 
 const createDestinationlist = () => {
   return CITIES.slice()
@@ -15,7 +16,7 @@ const createEditFormTemplate = (point) => {
     startDate, endDate,
     price = ``,
     offers = [],
-    info: {description = ``, photos = []}
+    info: {description = ``, photos = []},
   } = point;
 
   const startDateAndTime = startDate ? startDate.format(`DD/MM/YY MM:HH`) : ``;
@@ -143,7 +144,7 @@ const createEditFormTemplate = (point) => {
             </li>`;
 };
 
-class EditForm extends AbstractView {
+class EditForm extends SmartView {
   constructor(point) {
     super();
     this._point = point;
@@ -175,6 +176,17 @@ class EditForm extends AbstractView {
   getTemplate() {
     return createEditFormTemplate(this._point);
   }
+
+  restoreHandlers() {
+
+  }
+
+  // #3
+  // when changing `point type` show correct `option set`
+  // when choosing `point destination` show new `description & photos`
+
+  // #4
+  // When replacing component it's need to to restoreHandlers
 }
 
 export default EditForm;
