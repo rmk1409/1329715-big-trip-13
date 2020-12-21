@@ -55,4 +55,4 @@ const getInfo = (destination) => {
   return DESTINATION_INFO.get(destination);
 };
 
-export {getInfo};
+export {getInfo, DESTINATION_INFO};

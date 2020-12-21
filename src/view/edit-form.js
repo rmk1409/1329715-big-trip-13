@@ -2,6 +2,7 @@ import {CITIES, TYPES} from "../mock/point";
 import EditOffers from "./edit-offers";
 import SmartView from "./smart-view";
 import {getAvailableOffers} from "../mock/offer";
+import {DESTINATION_INFO} from '../mock/info';
 
 const createDestinationlist = () => {
   return CITIES.slice()
@@ -115,9 +116,24 @@ class EditForm extends SmartView {
 
     this._pointTypeHandler = this._pointTypeHandler.bind(this);
     this._offerChooseHandler = this._offerChooseHandler.bind(this);
+    this._changeDestinationHandler = this._changeDestinationHandler.bind(this);
 
     this.setPointTypeHandler();
     this.setOfferChooseHandler();
+    this.setChangeDestinationHandler();
+  }
+
+  _changeDestinationHandler(evt) {
+    evt.preventDefault();
+    const newDestination = evt.target.value;
+    const destinationInfo = DESTINATION_INFO.get(newDestination);
+    if ((this._state.destination !== newDestination) && destinationInfo) {
+      this.updateData({info: destinationInfo, destination: newDestination});
+    }
+  }
+
+  setChangeDestinationHandler() {
+    this.getElement().querySelector(`.event__input--destination`).addEventListener(`input`, this._changeDestinationHandler);
   }
 
   _pointTypeHandler(evt) {
@@ -184,10 +200,8 @@ class EditForm extends SmartView {
     this.getElement().addEventListener(`submit`, this._submitHandler);
     this.getElement().querySelector(`.event__type-list`).addEventListener(`change`, this._pointTypeHandler);
     this.setOfferChooseHandler();
+    this.setChangeDestinationHandler();
   }
-
-  // #3
-  // when choosing `point destination` show new `description & photos`
 }
 
 export default EditForm;
