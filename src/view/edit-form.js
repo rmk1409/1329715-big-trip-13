@@ -131,7 +131,7 @@ class EditForm extends SmartView {
 
   _submitHandler(evt) {
     evt.preventDefault();
-    this._cb.submit();
+    this._cb.submit(this._state);
   }
 
   _clickArrowHandler(evt) {
@@ -160,11 +160,7 @@ class EditForm extends SmartView {
   }
 
   // #3
-  // when changing `point type` show correct `option set`
   // when choosing `point destination` show new `description & photos`
-
-  // #4
-  // When replacing component it's need to to restoreHandlers
 }
 
 export default EditForm;

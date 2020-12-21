@@ -49,11 +49,13 @@ export default class Point {
     this._pointToForm();
   }
 
-  _submitHandler() {
+  _submitHandler(point) {
     this.formToPoint();
+    this.initOrUpdate(point);
   }
 
   _clickFormArrowHandler() {
+    this.reset();
     this.formToPoint();
   }
 
