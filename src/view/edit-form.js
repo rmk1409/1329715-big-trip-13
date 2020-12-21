@@ -224,7 +224,7 @@ class EditForm extends SmartView {
     } else {
       pointOffers.splice(pointOffers.indexOf(offer), 1);
     }
-    this.updateData({offers: pointOffers});
+    this.updateData({offers: pointOffers}, false);
   }
 
   setOfferChooseHandler() {
