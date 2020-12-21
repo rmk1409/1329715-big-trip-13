@@ -16,9 +16,11 @@ export default class SmartView extends AbstractView {
     this.restoreHandlers();
   }
 
-  updateData(changedData) {
+  updateData(changedData, needReload = true) {
     this._state = Object.assign({}, this._state, changedData);
-    this.updateElement();
+    if (needReload) {
+      this.updateElement();
+    }
     this._state.availableOffers = getAvailableOffers(this._state.type);
   }
 

@@ -4,6 +4,12 @@ import SmartView from "./smart-view";
 import {getAvailableOffers} from "../mock/offer";
 import {DESTINATION_INFO} from '../mock/info';
 
+import "../../node_modules/flatpickr/dist/flatpickr.min.css";
+import flatpickr from 'flatpickr';
+import dayjs from 'dayjs';
+
+const MIN_START_END_DATE_DIFFERENCE_IN_MINUTES = 5;
+
 const createDestinationlist = () => {
   return CITIES.slice()
     .map((city) => `<option value="${city}"></option>`).join(``);
@@ -111,16 +117,73 @@ const createEditFormTemplate = (point) => {
 class EditForm extends SmartView {
   constructor(point) {
     super(point);
+    this._startDatePicker = null;
+    this._endDatePicker = null;
+
     this._submitHandler = this._submitHandler.bind(this);
     this._clickArrowHandler = this._clickArrowHandler.bind(this);
 
     this._pointTypeHandler = this._pointTypeHandler.bind(this);
     this._offerChooseHandler = this._offerChooseHandler.bind(this);
     this._changeDestinationHandler = this._changeDestinationHandler.bind(this);
+    this._changeStartDateHandler = this._changeStartDateHandler.bind(this);
+    this._changeEndDateHandler = this._changeEndDateHandler.bind(this);
 
     this.setPointTypeHandler();
     this.setOfferChooseHandler();
     this.setChangeDestinationHandler();
+    this._setDatePickers();
+  }
+
+  _setDatePickers() {
+    if (this._startDatePicker) {
+      this._startDatePicker.destroy();
+      this._startDatePicker = null;
+    }
+    if (this._endDatePicker) {
+      this._endDatePicker.destroy();
+      this._endDatePicker = null;
+    }
+
+    this._startDatePicker = flatpickr(
+        this.getElement().querySelector(`.event__input--time[name=event-start-time]`),
+        {
+          enableTime: true,
+          // eslint-disable-next-line camelcase
+          time_24hr: true,
+          dateFormat: `d/m/y H:i`,
+          defaultDate: this._state.startDate.toDate(),
+          onChange: this._changeStartDateHandler,
+          maxDate: this._state.endDate.add(-MIN_START_END_DATE_DIFFERENCE_IN_MINUTES, `minute`).toDate()
+        }
+    );
+
+    this._endDatePicker = flatpickr(
+        this.getElement().querySelector(`.event__input--time[name=event-end-time]`),
+        {
+          enableTime: true,
+          // eslint-disable-next-line camelcase
+          time_24hr: true,
+          dateFormat: `d/m/y H:i`,
+          defaultDate: this._state.endDate.toDate(),
+          onChange: this._changeEndDateHandler,
+          minDate: this._state.startDate.add(MIN_START_END_DATE_DIFFERENCE_IN_MINUTES, `minute`).toDate()
+        }
+    );
+  }
+
+  _changeStartDateHandler([userDate]) {
+    this.updateData({startDate: dayjs(userDate)}, false);
+    if (this._endDatePicker) {
+      this._endDatePicker.set(`minDate`, this._state.startDate.add(MIN_START_END_DATE_DIFFERENCE_IN_MINUTES, `minute`).toDate());
+    }
+  }
+
+  _changeEndDateHandler([userDate]) {
+    this.updateData({endDate: dayjs(userDate)}, false);
+    if (this._startDatePicker) {
+      this._startDatePicker.set(`maxDate`, this._state.endDate.add(-MIN_START_END_DATE_DIFFERENCE_IN_MINUTES, `minute`).toDate());
+    }
   }
 
   _changeDestinationHandler(evt) {
@@ -201,6 +264,7 @@ class EditForm extends SmartView {
     this.getElement().querySelector(`.event__type-list`).addEventListener(`change`, this._pointTypeHandler);
     this.setOfferChooseHandler();
     this.setChangeDestinationHandler();
+    this._setDatePickers();
   }
 }
 
