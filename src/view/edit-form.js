@@ -109,10 +109,24 @@ const createEditFormTemplate = (point) => {
 
 class EditForm extends SmartView {
   constructor(point) {
-    super();
-    this._point = point;
+    super(point);
     this._submitHandler = this._submitHandler.bind(this);
     this._clickArrowHandler = this._clickArrowHandler.bind(this);
+
+    this._pointTypeHandler = this._pointTypeHandler.bind(this);
+
+    this.setPointTypeHandler();
+  }
+
+  _pointTypeHandler(evt) {
+    evt.preventDefault();
+    let value = evt.target.value;
+    value = `${value.charAt(0).toUpperCase()}${value.slice(1)}`;
+    this.updateData({type: value, offers: []});
+  }
+
+  setPointTypeHandler() {
+    this.getElement().querySelector(`.event__type-list`).addEventListener(`change`, this._pointTypeHandler);
   }
 
   _submitHandler(evt) {
@@ -122,7 +136,7 @@ class EditForm extends SmartView {
 
   _clickArrowHandler(evt) {
     evt.preventDefault();
-    this._cb.click();
+    this._cb.clickArrow();
   }
 
   setSubmitHandler(cb) {
@@ -131,17 +145,18 @@ class EditForm extends SmartView {
   }
 
   setClickArrowHandler(cb) {
-    this._cb.click = cb;
-    this.getElement().querySelector(`.event__rollup-btn`)
-      .addEventListener(`click`, this._clickArrowHandler);
+    this._cb.clickArrow = cb;
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._clickArrowHandler);
   }
 
   getTemplate() {
-    return createEditFormTemplate(this._point);
+    return createEditFormTemplate(this._state);
   }
 
   restoreHandlers() {
-
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._clickArrowHandler);
+    this.getElement().addEventListener(`submit`, this._submitHandler);
+    this.getElement().querySelector(`.event__type-list`).addEventListener(`change`, this._pointTypeHandler);
   }
 
   // #3

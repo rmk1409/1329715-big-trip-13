@@ -5,7 +5,7 @@ import {render, replace} from '../utils/render';
 export default class Point {
   constructor(pointsListContainer, toggleFormHandler, updateBoardData) {
     this._pointsListContainer = pointsListContainer;
-    this._pointData = null;
+    this._point = null;
 
     this._clickArrowHandler = this._clickArrowHandler.bind(this);
     this._submitHandler = this._submitHandler.bind(this);
@@ -17,11 +17,11 @@ export default class Point {
   }
 
   initOrUpdate(point) {
-    if (this._pointData) {
+    if (this._point) {
       this._updateBoardData(point);
     }
 
-    this._pointData = point;
+    this._point = point;
 
     const previousEvtComponent = this._evtComponent;
 
@@ -41,7 +41,7 @@ export default class Point {
   }
 
   _clickFavoriteHandler() {
-    const newPointData = Object.assign({}, this._pointData, {isFavorite: !this._pointData.isFavorite});
+    const newPointData = Object.assign({}, this._point, {isFavorite: !this._point.isFavorite});
     this.initOrUpdate(newPointData);
   }
 
@@ -65,5 +65,9 @@ export default class Point {
   formToPoint() {
     this._toggleFormHandler();
     replace(this._evtComponent, this._editFormComponent);
+  }
+
+  reset() {
+    this._editFormComponent.updateData(this._point);
   }
 }

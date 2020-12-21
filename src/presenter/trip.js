@@ -169,6 +169,7 @@ export default class Trip {
   _onEscKeyDown(evt) {
     if (evt.key === `Escape`) {
       evt.preventDefault();
+      this._openedPointPresenter.reset();
       this._openedPointPresenter.formToPoint();
       document.removeEventListener(`keydown`, this._onEscKeyDown);
     }

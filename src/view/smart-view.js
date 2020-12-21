@@ -1,19 +1,26 @@
 import AbstractView from "./abstract-view";
 
 export default class SmartView extends AbstractView {
-  restoreHandlers() {
-    throw new Error(`Must be implemented.`);
+  constructor(point) {
+    super();
+    this._state = Object.assign({}, point);
   }
 
   updateElement() {
-    // remove old DOM element
-    // create new DOM element
-    // replace old to new
-    // invoke restoreHandlers
+    const prevElement = this.getElement();
+    const parent = prevElement.parentElement;
+    this.removeElement();
+    const newElement = this.getElement();
+    parent.replaceChild(newElement, prevElement);
+    this.restoreHandlers();
   }
 
-  updateData() {
-    // update Data
-    // invoke updateElement
+  updateData(changedData) {
+    this._state = Object.assign({}, this._state, changedData);
+    this.updateElement();
+  }
+
+  restoreHandlers() {
+    throw new Error(`Must be implemented.`);
   }
 }
