@@ -114,8 +114,10 @@ class EditForm extends SmartView {
     this._clickArrowHandler = this._clickArrowHandler.bind(this);
 
     this._pointTypeHandler = this._pointTypeHandler.bind(this);
+    this._offerChooseHandler = this._offerChooseHandler.bind(this);
 
     this.setPointTypeHandler();
+    this.setOfferChooseHandler();
   }
 
   _pointTypeHandler(evt) {
@@ -127,6 +129,30 @@ class EditForm extends SmartView {
 
   setPointTypeHandler() {
     this.getElement().querySelector(`.event__type-list`).addEventListener(`change`, this._pointTypeHandler);
+  }
+
+  _offerChooseHandler(evt) {
+    evt.preventDefault();
+
+    const name = evt.target.name;
+    const isChecked = evt.target.checked;
+    const availableOffers = this._state.availableOffers;
+    const pointOffers = this._state.offers.slice();
+
+    const offer = availableOffers.find((curOffer) => curOffer.name === name);
+    if (isChecked) {
+      pointOffers.push(offer);
+    } else {
+      pointOffers.splice(pointOffers.indexOf(offer), 1);
+    }
+    this.updateData({offers: pointOffers});
+  }
+
+  setOfferChooseHandler() {
+    const offersElement = this.getElement().querySelector(`.event__available-offers`);
+    if (offersElement) {
+      offersElement.addEventListener(`change`, this._offerChooseHandler);
+    }
   }
 
   _submitHandler(evt) {
@@ -157,6 +183,7 @@ class EditForm extends SmartView {
     this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._clickArrowHandler);
     this.getElement().addEventListener(`submit`, this._submitHandler);
     this.getElement().querySelector(`.event__type-list`).addEventListener(`change`, this._pointTypeHandler);
+    this.setOfferChooseHandler();
   }
 
   // #3

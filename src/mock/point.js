@@ -1,5 +1,5 @@
 import {getRandomNumber, getRandomValueOfArray} from "../utils/common";
-import {getOffers} from "./offer";
+import {getAvailableOffers, getOffers} from "./offer";
 import {getInfo} from "./info";
 import dayjs from "dayjs";
 
@@ -47,6 +47,7 @@ const generatePoint = () => {
   };
   setInfo(point);
   setOffers(point);
+  point.availableOffers = getAvailableOffers(point.type);
   setDates(point);
   return point;
 };
