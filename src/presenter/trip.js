@@ -133,7 +133,7 @@ export default class Trip {
   }
 
   _renderPoint(point, pointsListContainer) {
-    const presenter = new Point(pointsListContainer, this._updateBoardData);
+    const presenter = new Point(pointsListContainer, this._toggleFormHandler, this._updateBoardData);
     presenter.initOrUpdate(point);
   }
 
@@ -169,6 +169,7 @@ export default class Trip {
   _onEscKeyDown(evt) {
     if (evt.key === `Escape`) {
       evt.preventDefault();
+      this._openedPointPresenter.reset();
       this._openedPointPresenter.formToPoint();
       document.removeEventListener(`keydown`, this._onEscKeyDown);
     }

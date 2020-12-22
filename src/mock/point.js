@@ -1,5 +1,5 @@
 import {getRandomNumber, getRandomValueOfArray} from "../utils/common";
-import {getOffers} from "./offer";
+import {getAvailableOffers, getOffers} from "./offer";
 import {getInfo} from "./info";
 import dayjs from "dayjs";
 
@@ -23,6 +23,13 @@ const setDates = (point) => {
   point.endDate = endDate;
 };
 
+const setOffers = (point) => {
+  point.offers = getOffers(point.type);
+};
+const setInfo = (point) => {
+  point.info = getInfo(point.destination);
+};
+
 const createIdGenerator = () => {
   let i = 1;
   return () => i++;
@@ -35,13 +42,14 @@ const generatePoint = () => {
     id: getNextId(),
     type: getRandomValueOfArray(TYPES),
     destination: getRandomValueOfArray(CITIES),
-    offers: getOffers(),
-    info: getInfo(),
     isFavorite: Boolean(getRandomNumber(0, 1)),
     price: getRandomNumber(MIN_POINT_PRICE, MAX_POINT_PRICE),
   };
+  setInfo(point);
+  setOffers(point);
+  point.availableOffers = getAvailableOffers(point.type);
   setDates(point);
   return point;
 };
 
-export {generatePoint, CITIES};
+export {generatePoint, CITIES, TYPES};

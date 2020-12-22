@@ -1,6 +1,6 @@
 import Offer from "./offer";
-import AbstractView from "./abstract-view";
 import {getDateDifference} from "../utils/point";
+import SmartView from './smart-view';
 
 const createTripEventsItemTemplate = (point) => {
   const {startDate, type, destination, endDate, price, offers, isFavorite} = point;
@@ -44,10 +44,9 @@ const createTripEventsItemTemplate = (point) => {
             </li>`;
 };
 
-class TripEventsItem extends AbstractView {
+class TripEventsItem extends SmartView {
   constructor(point) {
-    super();
-    this._point = point;
+    super(point);
     this._clickArrowHandler = this._clickArrowHandler.bind(this);
     this._clickFavoriteHandler = this._clickFavoriteHandler.bind(this);
   }
@@ -63,19 +62,22 @@ class TripEventsItem extends AbstractView {
   }
 
   getTemplate() {
-    return createTripEventsItemTemplate(this._point);
+    return createTripEventsItemTemplate(this._state);
   }
 
   setClickArrowHandler(cb) {
     this._cb.clickArrow = cb;
-    this.getElement().querySelector(`.event__rollup-btn`)
-      .addEventListener(`click`, this._clickArrowHandler);
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._clickArrowHandler);
   }
 
   setClickFavoriteHandler(cb) {
     this._cb.clickFavorite = cb;
-    this.getElement().querySelector(`.event__favorite-btn`)
-      .addEventListener(`click`, this._clickFavoriteHandler);
+    this.getElement().querySelector(`.event__favorite-btn`).addEventListener(`click`, this._clickFavoriteHandler);
+  }
+
+  restoreHandlers() {
+    this.getElement().querySelector(`.event__favorite-btn`).addEventListener(`click`, this._clickFavoriteHandler);
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._clickArrowHandler);
   }
 }
 
