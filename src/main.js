@@ -1,5 +1,5 @@
 import {generatePoint} from "./mock/point";
-import Trip from './presenter/trip';
+import {Trip} from './presenter/trip';
 
 const ITEM_COUNT = 20;
 
