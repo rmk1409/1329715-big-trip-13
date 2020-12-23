@@ -14,7 +14,7 @@ const SortMode = {
   PRICE: `sort-price`,
 };
 
-export default class Trip {
+class Trip {
   constructor(tripInfoContainer, pointsInfoContainer) {
     this._tripInfoContainer = tripInfoContainer;
     this._pointsInfoContainer = pointsInfoContainer;
@@ -88,11 +88,11 @@ export default class Trip {
     this._points.sort((a, b) => a.price - b.price);
   }
 
-  _sortChangeHandler(data) {
-    if (this._isAnotherMode(data)) {
-      this._currentSortMode = data;
+  _sortChangeHandler(sortType) {
+    if (Object.values(SortMode).indexOf(sortType) !== -1 && this._isAnotherMode(sortType)) {
+      this._currentSortMode = sortType;
 
-      switch (data) {
+      switch (sortType) {
         case SortMode.DEFAULT:
           this._sortByDay();
           break;
@@ -103,6 +103,10 @@ export default class Trip {
           this._sortByPrice();
           break;
       }
+
+      const element = this._sortView.getElement();
+      element.querySelector(`input[name=trip-sort]:checked`).checked = false;
+      element.querySelector(`input[id=${sortType}]`).checked = true;
 
       this._renderPoints();
     }
@@ -175,3 +179,5 @@ export default class Trip {
     }
   }
 }
+
+export {Trip, SortMode};

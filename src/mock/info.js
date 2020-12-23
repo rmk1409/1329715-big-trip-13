@@ -4,7 +4,7 @@ import {CITIES} from "./point";
 const MAX_DESCRIPTION_LENGTH = 5;
 const MAX_PHOTO_COUNT = 7;
 
-let DESTINATION_INFO = null;
+let destinationInfo = null;
 
 const DESCRIPTIONS = [
   `Lorem ipsum dolor sit amet, consectetur adipiscing elit.`,
@@ -39,9 +39,9 @@ const getPhoto = () => {
 };
 
 const initInfo = () => {
-  DESTINATION_INFO = new Map();
+  destinationInfo = new Map();
   CITIES.forEach((destination) => {
-    DESTINATION_INFO.set(destination, {
+    destinationInfo.set(destination, {
       description: getDescription(),
       photos: getPhoto(),
     });
@@ -49,10 +49,10 @@ const initInfo = () => {
 };
 
 const getInfo = (destination) => {
-  if (!DESTINATION_INFO) {
+  if (!destinationInfo) {
     initInfo();
   }
-  return DESTINATION_INFO.get(destination);
+  return destinationInfo.get(destination);
 };
 
-export {getInfo, DESTINATION_INFO};
+export {getInfo, destinationInfo};

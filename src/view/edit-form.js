@@ -2,7 +2,7 @@ import {CITIES, TYPES} from "../mock/point";
 import EditOffers from "./edit-offers";
 import SmartView from "./smart-view";
 import {getAvailableOffers} from "../mock/offer";
-import {DESTINATION_INFO} from '../mock/info';
+import {destinationInfo} from '../mock/info';
 
 import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 import flatpickr from 'flatpickr';
@@ -86,7 +86,7 @@ const createEditFormTemplate = (point) => {
                   </div>
 
                   <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-                  <button class="event__reset-btn" type="reset">Cancel</button>
+                  <button class="event__reset-btn" type="reset">Delete</button>
                   <button class="event__rollup-btn" type="button">
                     <span class="visually-hidden">Open event</span>
                   </button>
@@ -189,9 +189,9 @@ class EditForm extends SmartView {
   _changeDestinationHandler(evt) {
     evt.preventDefault();
     const newDestination = evt.target.value;
-    const destinationInfo = DESTINATION_INFO.get(newDestination);
-    if ((this._state.destination !== newDestination) && destinationInfo) {
-      this.updateData({info: destinationInfo, destination: newDestination});
+    const pointInfo = destinationInfo.get(newDestination);
+    if ((this._state.destination !== newDestination) && pointInfo) {
+      this.updateData({info: pointInfo, destination: newDestination});
     }
   }
 
