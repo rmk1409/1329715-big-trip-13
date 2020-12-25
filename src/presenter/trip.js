@@ -14,10 +14,16 @@ const SortMode = {
   PRICE: `sort-price`,
 };
 
+const sortMap = new Map();
+sortMap.set(SortMode.DEFAULT, (a, b) => a.startDate.isBefore(b.startDate) ? -1 : 1);
+sortMap.set(SortMode.TIME, (a, b) => a.endDate.diff(a.startDate) - b.endDate.diff(b.startDate));
+sortMap.set(SortMode.PRICE, (a, b) => a.price - b.price);
+
 class Trip {
-  constructor(tripInfoContainer, pointsInfoContainer) {
+  constructor(tripInfoContainer, pointsInfoContainer, pointsModel) {
     this._tripInfoContainer = tripInfoContainer;
     this._pointsInfoContainer = pointsInfoContainer;
+    this._pointsModel = pointsModel;
 
     this._menuView = new Menu();
     this._filterView = new Filters();
@@ -25,7 +31,6 @@ class Trip {
     this._pointListView = new TripEventsList();
     this._noPointsView = new ListEmpty();
 
-    this._points = null;
     this._tripInfoView = null;
     this._tripCostView = null;
 
@@ -38,11 +43,9 @@ class Trip {
     this._currentSortMode = SortMode.DEFAULT;
   }
 
-  init(points) {
-    this._points = points.slice();
-
-    this._tripInfoView = new TripInfo(this._points);
-    this._tripCostView = new TripCost(this._points);
+  init() {
+    this._tripInfoView = new TripInfo(this._pointsModel.tripPoints);
+    this._tripCostView = new TripCost(this._pointsModel.tripPoints);
 
     this._renderTrip();
   }
@@ -56,8 +59,7 @@ class Trip {
     this._renderTripInfo();
     this._renderTripCost();
 
-    this._sortByDay();
-    this._renderPoints();
+    this._renderPoints(this._getPoints());
   }
 
   _renderMenu() {
@@ -76,39 +78,20 @@ class Trip {
     render(tripSortHeader, this._sortView, RenderPosition.AFTER_END);
   }
 
-  _sortByDay() {
-    this._points.sort((a, b) => a.startDate.isBefore(b.startDate) ? -1 : 1);
-  }
-
-  _sortByTime() {
-    this._points.sort((a, b) => a.endDate.diff(a.startDate) - b.endDate.diff(b.startDate));
-  }
-
-  _sortByPrice() {
-    this._points.sort((a, b) => a.price - b.price);
+  _getPoints() {
+    const points = this._pointsModel.tripPoints.slice();
+    points.sort(sortMap.get(this._currentSortMode));
+    return points;
   }
 
   _sortChangeHandler(sortType) {
     if (Object.values(SortMode).indexOf(sortType) !== -1 && this._isAnotherMode(sortType)) {
       this._currentSortMode = sortType;
-
-      switch (sortType) {
-        case SortMode.DEFAULT:
-          this._sortByDay();
-          break;
-        case SortMode.TIME:
-          this._sortByTime();
-          break;
-        case SortMode.PRICE:
-          this._sortByPrice();
-          break;
-      }
-
       const element = this._sortView.getElement();
       element.querySelector(`input[name=trip-sort]:checked`).checked = false;
       element.querySelector(`input[id=${sortType}]`).checked = true;
 
-      this._renderPoints();
+      this._renderPoints(this._getPoints());
     }
   }
 
@@ -126,11 +109,11 @@ class Trip {
     document.removeEventListener(`keydown`, this._onEscKeyDown);
   }
 
-  _renderPoints() {
+  _renderPoints(points) {
     this._clearPointsList();
-    if (this._points.length) {
+    if (points.length) {
       const pointsListContainer = this._pointsInfoContainer.querySelector(`.trip-events__list`);
-      this._points.forEach((point) => this._renderPoint(point, pointsListContainer));
+      points.forEach((point) => this._renderPoint(point, pointsListContainer));
     } else {
       this._renderNoPoints();
     }
@@ -142,8 +125,7 @@ class Trip {
   }
 
   _updateBoardData(updatePoint) {
-    const index = this._points.findIndex((point) => point.id === updatePoint.id);
-    this._points[index] = updatePoint;
+    this._pointsModel.updateTripPoint(updatePoint);
   }
 
   _renderNoPoints() {
