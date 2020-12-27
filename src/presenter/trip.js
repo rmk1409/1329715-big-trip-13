@@ -26,7 +26,7 @@ class Trip {
     this._pointsModel = pointsModel;
 
     this._menuView = new Menu();
-    this._filterView = new Filters();
+    // this._filterView = new Filters();
     this._sortView = new Sort();
     this._pointListView = new TripEventsList();
     this._noPointsView = new ListEmpty();
@@ -52,7 +52,7 @@ class Trip {
 
   _renderTrip() {
     this._renderMenu();
-    this._renderFilters();
+    // this._renderFilters();
     this._renderSort();
     this._renderTripEventsList();
 
@@ -67,10 +67,10 @@ class Trip {
     render(menuHeader, this._menuView, RenderPosition.AFTER_END);
   }
 
-  _renderFilters() {
-    const filterHeader = this._tripInfoContainer.querySelector(`.trip-controls h2:nth-of-type(2)`);
-    render(filterHeader, this._filterView, RenderPosition.AFTER_END);
-  }
+  // _renderFilters() {
+  //   const filterHeader = this._tripInfoContainer.querySelector(`.trip-controls h2:nth-of-type(2)`);
+  //   render(filterHeader, this._filterView, RenderPosition.AFTER_END);
+  // }
 
   _renderSort() {
     this._sortView.setSortChangeHandler(this._sortChangeHandler);

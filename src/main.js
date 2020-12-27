@@ -1,18 +1,21 @@
 import {generatePoint} from "./mock/point";
-import {Trip} from './presenter/trip';
-import Points from "./model/points";
+import {Trip as TripPresenter} from './presenter/trip';
+import {Points as PointsModel} from "./model/points";
+import {Filter as FilterPresenter} from "./presenter/filter";
+import {Filter as FilterModel} from "./model/filter";
 
-const ITEM_COUNT = 0;
+const ITEM_COUNT = 20;
 
 const tripMain = document.querySelector(`.trip-main`);
 const tripEvents = document.querySelector(`.trip-events`);
+const filterHeader = tripMain.querySelector(`.trip-controls h2:nth-of-type(2)`);
 
 const points = [];
 for (let i = 0; i < ITEM_COUNT; i++) {
   points.push(generatePoint());
 }
 
-const pointsModel = new Points();
-pointsModel.tripPoints = points;
+const pointsModel = new PointsModel(points);
 
-new Trip(tripMain, tripEvents, pointsModel).init();
+new TripPresenter(tripMain, tripEvents, pointsModel).init();
+new FilterPresenter(filterHeader, new FilterModel(), pointsModel).init();

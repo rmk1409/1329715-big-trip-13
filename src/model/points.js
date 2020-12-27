@@ -1,4 +1,8 @@
-export default class Points {
+class Points {
+  constructor(tripPoints) {
+    this._tripPoints = tripPoints;
+  }
+
   set tripPoints(tripPoints) {
     this._tripPoints = tripPoints.slice();
   }
@@ -12,3 +16,5 @@ export default class Points {
     this._tripPoints[index] = newTripPoint;
   }
 }
+
+export {Points};
