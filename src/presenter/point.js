@@ -1,9 +1,10 @@
 import EditForm from '../view/edit-form';
 import TripEventsItem from '../view/trip-events-item';
 import {render, replace} from '../utils/render';
+import {ActionType, UpdateType} from "../util/const";
 
-export default class Point {
-  constructor(pointsListContainer, toggleFormHandler, updateBoardData) {
+class Point {
+  constructor(pointsListContainer, toggleFormHandler, changePointsModelHandler) {
     this._pointsListContainer = pointsListContainer;
     this._point = null;
 
@@ -11,38 +12,54 @@ export default class Point {
     this._submitHandler = this._submitHandler.bind(this);
     this._clickFormArrowHandler = this._clickFormArrowHandler.bind(this);
     this._clickFavoriteHandler = this._clickFavoriteHandler.bind(this);
+    this._clickDeleteButton = this._clickDeleteButton.bind(this);
 
     this._toggleFormHandler = toggleFormHandler;
-    this._updateBoardData = updateBoardData;
+    this._changePointsModelHander = changePointsModelHandler;
   }
 
-  initOrUpdate(point) {
-    if (this._point) {
-      this._updateBoardData(point);
-    }
+  _createComponents() {
+    this._evtComponent = new TripEventsItem(this._point);
+    this._editFormComponent = new EditForm(this._point);
+  }
 
-    this._point = point;
-
-    const previousEvtComponent = this._evtComponent;
-
-    this._evtComponent = new TripEventsItem(point);
-    this._editFormComponent = new EditForm(point);
-
+  _setHandlersToComponents() {
     this._evtComponent.setClickArrowHandler(this._clickArrowHandler);
     this._evtComponent.setClickFavoriteHandler(this._clickFavoriteHandler);
     this._editFormComponent.setSubmitHandler(this._submitHandler);
     this._editFormComponent.setClickArrowHandler(this._clickFormArrowHandler);
+    this._editFormComponent.setDeleteButtonHandler(this._clickDeleteButton);
+  }
 
-    if (previousEvtComponent) {
-      replace(this._evtComponent, previousEvtComponent);
-    } else {
-      render(this._pointsListContainer, this._evtComponent, `beforeend`);
-    }
+  init(point) {
+    this._point = point;
+
+    this._createComponents();
+    this._setHandlersToComponents();
+
+    render(this._pointsListContainer, this._evtComponent, `beforeend`);
+  }
+
+  update(point) {
+    this._point = point;
+
+    const previousEvtComponent = this._evtComponent;
+    const previousFormComponent = this._editFormComponent;
+
+    this._createComponents();
+    this._setHandlersToComponents();
+
+    replace(this._evtComponent, previousEvtComponent);
+    replace(this._editFormComponent, previousFormComponent);
+  }
+
+  _clickDeleteButton() {
+    this._changePointsModelHander(this._point, ActionType.DELETE, UpdateType.MAJOR);
   }
 
   _clickFavoriteHandler() {
     const newPointData = Object.assign({}, this._point, {isFavorite: !this._point.isFavorite});
-    this.initOrUpdate(newPointData);
+    this._changePointsModelHander(newPointData, ActionType.UPDATE, UpdateType.PATCH);
   }
 
   _clickArrowHandler() {
@@ -51,7 +68,7 @@ export default class Point {
 
   _submitHandler(point) {
     this.formToPoint();
-    this.initOrUpdate(point);
+    this._changePointsModelHander(point, ActionType.UPDATE, UpdateType.MAJOR);
   }
 
   _clickFormArrowHandler() {
@@ -73,3 +90,5 @@ export default class Point {
     this._editFormComponent.updateData(this._point);
   }
 }
+
+export {Point};

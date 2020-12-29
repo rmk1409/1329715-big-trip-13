@@ -52,4 +52,4 @@ const generatePoint = () => {
   return point;
 };
 
-export {generatePoint, CITIES, TYPES};
+export {generatePoint, CITIES, TYPES, getNextId};

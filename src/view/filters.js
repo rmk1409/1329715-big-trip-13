@@ -1,7 +1,10 @@
 import AbstractView from "./abstract-view";
 import {FilterFunctions, FilterType} from "../model/filter";
 
-const createFiltersTemplate = (pointsModel) => {
+const createFiltersTemplate = (points) => {
+  const isFutureActive = FilterFunctions.get(FilterType.FUTURE)(points).length;
+  const isPastActive = FilterFunctions.get(FilterType.PAST)(points).length;
+
   return `<form class="trip-filters" action="#" method="get">
               <div class="trip-filters__filter">
                 <input id="filter-everything" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="everything" checked>
@@ -9,12 +12,12 @@ const createFiltersTemplate = (pointsModel) => {
               </div>
 
               <div class="trip-filters__filter">
-                <input id="filter-future" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="future" ${FilterFunctions.get(FilterType.FUTURE)(pointsModel.tripPoints).length ? `` : `disabled`}>
+                <input id="filter-future" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="future" ${isFutureActive ? `` : `disabled`}>
                 <label class="trip-filters__filter-label" for="filter-future">Future</label>
               </div>
 
               <div class="trip-filters__filter">
-                <input id="filter-past" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="past" ${FilterFunctions.get(FilterType.FUTURE)(pointsModel.tripPoints).length ? `` : `disabled`}>
+                <input id="filter-past" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="past" ${isPastActive ? `` : `disabled`}>
                 <label class="trip-filters__filter-label" for="filter-past">Past</label>
               </div>
 
@@ -23,14 +26,14 @@ const createFiltersTemplate = (pointsModel) => {
 };
 
 class Filters extends AbstractView {
-  constructor(pointsModel) {
+  constructor(points) {
     super();
-    this._pointsModel = pointsModel;
+    this._points = points;
   }
 
   getTemplate() {
-    return createFiltersTemplate(this._pointsModel);
+    return createFiltersTemplate(this._points);
   }
 }
 
-export default Filters;
+export {Filters};
