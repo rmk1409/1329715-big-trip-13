@@ -1,4 +1,4 @@
-import {render, RenderPosition} from "../utils/render";
+import {render, RenderPosition} from "../util/render";
 import {Filters as FilterView} from "../view/filters";
 import Observer from "../util/pattern/observer/observer";
 
@@ -28,7 +28,7 @@ class Filter extends Observer {
     return this._model.activeFilter;
   }
 
-  update(updatedPoint, updateType) {
+  update(updateType, updatedPoint) {
 
   }
 }

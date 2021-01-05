@@ -27,7 +27,7 @@ class Points extends Subject {
   }
 
   notifyAllObservers(updatedPoint, updateType) {
-    this._observers.forEach((observer) => observer.update(updatedPoint, updateType));
+    this._observers.forEach((observer) => observer.update(updateType, updatedPoint));
   }
 }
 

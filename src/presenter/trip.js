@@ -4,7 +4,7 @@ import TripEventsList from '../view/trip-events-list';
 import Sort from '../view/sort';
 import TripInfo from '../view/trip-info';
 import TripCost from '../view/trip-cost';
-import {render, RenderPosition} from '../utils/render';
+import {render, RenderPosition} from '../util/render';
 import ListEmpty from '../view/list-empty';
 import {Point as PointPresenter} from './point';
 import Observer from "../util/pattern/observer/observer";
@@ -122,7 +122,7 @@ class Trip extends Observer {
     return newSortMode !== this._currentSortMode;
   }
 
-  update(updatedPoint, updateType) {
+  update(updateType, updatedPoint) {
     switch (updateType) {
       case UpdateType.PATCH:
         this._pointPresenters.get(updatedPoint.id).update(updatedPoint);

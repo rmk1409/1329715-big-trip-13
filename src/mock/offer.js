@@ -1,4 +1,4 @@
-import {getRandomValueOfArray} from "../utils/common";
+import {getRandomValueOfArray} from "../util/common";
 
 const OFFERS_MAP = new Map();
 OFFERS_MAP.set(`food`, [

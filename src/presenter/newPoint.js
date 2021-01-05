@@ -2,7 +2,7 @@ import EditForm from "../view/edit-form";
 import {ActionType, UpdateType} from "../util/const";
 import {TYPES} from "../mock/point";
 import dayjs from "dayjs";
-import {render, replace} from "../utils/render";
+import {render, replace} from "../util/render";
 
 
 const EMPTY_POINT = {

@@ -1,4 +1,4 @@
-import {getRandomValueOfArray} from "../utils/common";
+import {getRandomValueOfArray} from "../util/common";
 import {CITIES} from "./point";
 
 const MAX_DESCRIPTION_LENGTH = 5;

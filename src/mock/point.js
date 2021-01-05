@@ -1,4 +1,4 @@
-import {getRandomNumber, getRandomValueOfArray} from "../utils/common";
+import {getRandomNumber, getRandomValueOfArray} from "../util/common";
 import {getAvailableOffers, getOffers} from "./offer";
 import {getInfo} from "./info";
 import dayjs from "dayjs";

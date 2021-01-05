@@ -1,6 +1,6 @@
 import EditForm from '../view/edit-form';
 import TripEventsItem from '../view/trip-events-item';
-import {render, replace} from '../utils/render';
+import {render, replace} from '../util/render';
 import {ActionType, UpdateType} from "../util/const";
 
 class Point {
