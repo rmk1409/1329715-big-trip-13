@@ -203,9 +203,19 @@ class EditForm extends SmartView {
     }
   }
 
+  _checkIsValidForm() {
+    const element = this.getElement();
+    const price = +element.querySelector(`.event__input--price`).value;
+    const destination = element.querySelector(`.event__input--destination`).value;
+    const saveButton = element.querySelector(`.event__save-btn`);
+    const isInputDataValid = Number.isInteger(price) && CITIES.indexOf(destination) !== -1;
+    saveButton.disabled = !isInputDataValid;
+  }
+
   _changePriceHandler(evt) {
     const newPrice = evt.target.value;
     this.updateData({price: +newPrice}, false);
+    this._checkIsValidForm();
   }
 
   setChangePriceHandler() {
@@ -219,6 +229,7 @@ class EditForm extends SmartView {
     if ((this._state.destination !== newDestination) && pointInfo) {
       this.updateData({info: pointInfo, destination: newDestination});
     }
+    this._checkIsValidForm();
   }
 
   setChangeDestinationHandler() {
