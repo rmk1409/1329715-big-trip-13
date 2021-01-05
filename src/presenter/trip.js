@@ -1,12 +1,15 @@
 import Menu from '../view/menu';
-import Filters from '../view/filters';
 import TripEventsList from '../view/trip-events-list';
 import Sort from '../view/sort';
 import TripInfo from '../view/trip-info';
 import TripCost from '../view/trip-cost';
-import {render, RenderPosition} from '../utils/render';
+import {remove, render, RenderPosition} from '../util/render';
 import ListEmpty from '../view/list-empty';
-import Point from './point';
+import {Point as PointPresenter} from './point';
+import Observer from "../util/pattern/observer/observer";
+import {ActionType, UpdateType} from "../util/const";
+import NewPoint from "./newPoint";
+import {FilterFunctions, FilterType} from "../model/filter";
 
 const SortMode = {
   DEFAULT: `sort-day`,
@@ -14,18 +17,26 @@ const SortMode = {
   PRICE: `sort-price`,
 };
 
-class Trip {
-  constructor(tripInfoContainer, pointsInfoContainer) {
+const sortMap = new Map();
+sortMap.set(SortMode.DEFAULT, (a, b) => a.startDate.isBefore(b.startDate) ? -1 : 1);
+sortMap.set(SortMode.TIME, (a, b) => a.endDate.diff(a.startDate) - b.endDate.diff(b.startDate));
+sortMap.set(SortMode.PRICE, (a, b) => a.price - b.price);
+
+class Trip extends Observer {
+  constructor(tripInfoContainer, pointsInfoContainer, pointsModel, filterModel) {
+    super(pointsModel);
+
+    this._filterModel = filterModel;
+    this._filterModel.addObserver(this);
+
     this._tripInfoContainer = tripInfoContainer;
     this._pointsInfoContainer = pointsInfoContainer;
 
     this._menuView = new Menu();
-    this._filterView = new Filters();
-    this._sortView = new Sort();
+    this._sortView = null;
     this._pointListView = new TripEventsList();
     this._noPointsView = new ListEmpty();
 
-    this._points = null;
     this._tripInfoView = null;
     this._tripCostView = null;
 
@@ -34,30 +45,44 @@ class Trip {
     this._toggleFormHandler = this._toggleFormHandler.bind(this);
     this._sortChangeHandler = this._sortChangeHandler.bind(this);
     this._onEscKeyDown = this._onEscKeyDown.bind(this);
-    this._updateBoardData = this._updateBoardData.bind(this);
+    this._changePointsModelHandler = this._changePointsModelHandler.bind(this);
     this._currentSortMode = SortMode.DEFAULT;
+    this._pointPresenters = new Map();
+
+    this._newPointHandler = this._newPointHandler.bind(this);
+
+    this._openedNewPointPresenter = false;
   }
 
-  init(points) {
-    this._points = points.slice();
-
-    this._tripInfoView = new TripInfo(this._points);
-    this._tripCostView = new TripCost(this._points);
-
-    this._renderTrip();
-  }
-
-  _renderTrip() {
-    this._renderMenu();
-    this._renderFilters();
-    this._renderSort();
+  init() {
     this._renderTripEventsList();
+    this._pointsListContainer = this._pointsInfoContainer.querySelector(`.trip-events__list`);
 
-    this._renderTripInfo();
-    this._renderTripCost();
+    this.newPoint = new NewPoint(this._pointsListContainer, this._changePointsModelHandler, this._toggleFormHandler);
 
-    this._sortByDay();
-    this._renderPoints();
+    this._renderMenu();
+    this._renderTripInfoAndCost();
+
+    this._renderBoard();
+
+    this._tripInfoContainer.querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, this._newPointHandler);
+  }
+
+  _newPointHandler() {
+    this._currentSortMode = SortMode.DEFAULT;
+    this._filterModel.state = FilterType.EVERYTHING;
+
+    if (this._openedPointPresenter) {
+      this._openedPointPresenter.formToPoint();
+      document.removeEventListener(`keydown`, this._onEscKeyDown);
+      this._openedPointPresenter = null;
+    }
+
+    if (!this._openedNewPointPresenter) {
+      this.newPoint.init();
+      this._openedNewPointPresenter = true;
+      document.addEventListener(`keydown`, this._onEscKeyDown);
+    }
   }
 
   _renderMenu() {
@@ -65,101 +90,137 @@ class Trip {
     render(menuHeader, this._menuView, RenderPosition.AFTER_END);
   }
 
-  _renderFilters() {
-    const filterHeader = this._tripInfoContainer.querySelector(`.trip-controls h2:nth-of-type(2)`);
-    render(filterHeader, this._filterView, RenderPosition.AFTER_END);
-  }
-
   _renderSort() {
+    if (this._sortView) {
+      remove(this._sortView);
+      this._sortView = null;
+    }
+    this._sortView = new Sort(this._currentSortMode);
     this._sortView.setSortChangeHandler(this._sortChangeHandler);
     const tripSortHeader = this._pointsInfoContainer.querySelector(`h2:first-child`);
     render(tripSortHeader, this._sortView, RenderPosition.AFTER_END);
   }
 
-  _sortByDay() {
-    this._points.sort((a, b) => a.startDate.isBefore(b.startDate) ? -1 : 1);
-  }
-
-  _sortByTime() {
-    this._points.sort((a, b) => a.endDate.diff(a.startDate) - b.endDate.diff(b.startDate));
-  }
-
-  _sortByPrice() {
-    this._points.sort((a, b) => a.price - b.price);
+  _getPoints() {
+    const points = this._subject.state.slice();
+    const filterType = this._filterModel.state;
+    const filteredPoints = FilterFunctions.get(filterType)(points);
+    filteredPoints.sort(sortMap.get(this._currentSortMode));
+    return filteredPoints;
   }
 
   _sortChangeHandler(sortType) {
     if (Object.values(SortMode).indexOf(sortType) !== -1 && this._isAnotherMode(sortType)) {
       this._currentSortMode = sortType;
-
-      switch (sortType) {
-        case SortMode.DEFAULT:
-          this._sortByDay();
-          break;
-        case SortMode.TIME:
-          this._sortByTime();
-          break;
-        case SortMode.PRICE:
-          this._sortByPrice();
-          break;
-      }
-
-      const element = this._sortView.getElement();
-      element.querySelector(`input[name=trip-sort]:checked`).checked = false;
-      element.querySelector(`input[id=${sortType}]`).checked = true;
-
-      this._renderPoints();
+      this._clearPointsBoard();
+      this._renderBoard();
     }
   }
 
-  _isAnotherMode(data) {
-    return data !== this._currentSortMode;
+  _isAnotherMode(newSortMode) {
+    return newSortMode !== this._currentSortMode;
+  }
+
+  update(updateType, updatedPoint) {
+    switch (updateType) {
+      case UpdateType.PATCH:
+        this._pointPresenters.get(updatedPoint.id).update(updatedPoint);
+        break;
+      case UpdateType.MINOR:
+        this._clearPointsBoard();
+        this._renderBoard();
+        break;
+      case UpdateType.MAJOR:
+        this._clearPointsBoard(true);
+        this._renderBoard();
+        this._renderTripInfoAndCost();
+        break;
+    }
+  }
+
+  _renderBoard() {
+    this._renderPoints(this._getPoints());
+    this._renderSort();
+
+  }
+
+  _changePointsModelHandler(updatedPoint, actionType, updateType) {
+    switch (actionType) {
+      case ActionType.ADD:
+        this._subject.addPoint(updatedPoint, updateType);
+        break;
+      case ActionType.UPDATE:
+        this._subject.updatePoint(updatedPoint, updateType);
+        break;
+      case ActionType.DELETE:
+        this._subject.deletePoint(updatedPoint, updateType);
+        break;
+    }
   }
 
   _renderTripEventsList() {
     render(this._pointsInfoContainer, this._pointListView, RenderPosition.BEFORE_END);
   }
 
-  _clearPointsList() {
+  _clearPointsBoard(resetSort) {
     this._pointsInfoContainer.querySelector(`.trip-events__list`).innerHTML = ``;
     this._openedPointPresenter = null;
     document.removeEventListener(`keydown`, this._onEscKeyDown);
+    this._pointPresenters.clear();
+    document.querySelectorAll(`.flatpickr-calendar`).forEach((e) => e.remove());
+
+    if (resetSort) {
+      this._currentSortMode = SortMode.DEFAULT;
+    }
+
+    remove(this._noPointsView);
   }
 
-  _renderPoints() {
-    this._clearPointsList();
-    if (this._points.length) {
-      const pointsListContainer = this._pointsInfoContainer.querySelector(`.trip-events__list`);
-      this._points.forEach((point) => this._renderPoint(point, pointsListContainer));
+  _renderPoints(points) {
+    if (points.length) {
+      points.forEach((point) => this._renderPoint(point));
     } else {
       this._renderNoPoints();
     }
   }
 
-  _renderPoint(point, pointsListContainer) {
-    const presenter = new Point(pointsListContainer, this._toggleFormHandler, this._updateBoardData);
-    presenter.initOrUpdate(point);
-  }
-
-  _updateBoardData(updatePoint) {
-    const index = this._points.findIndex((point) => point.id === updatePoint.id);
-    this._points[index] = updatePoint;
+  _renderPoint(point) {
+    const presenter = new PointPresenter(this._pointsListContainer, this._toggleFormHandler, this._changePointsModelHandler);
+    presenter.init(point);
+    this._pointPresenters.set(point.id, presenter);
   }
 
   _renderNoPoints() {
     render(this._pointsInfoContainer, this._noPointsView, RenderPosition.BEFORE_END);
   }
 
+  _renderTripInfoAndCost() {
+    const previousTripInfo = this._tripInfoContainer.querySelector(`.trip-main__trip-info`);
+    if (previousTripInfo) {
+      previousTripInfo.remove();
+    }
+    this._renderTripInfo();
+    this._renderTripCost();
+  }
+
   _renderTripInfo() {
+    this._tripInfoView = new TripInfo(this._getPoints());
     render(this._tripInfoContainer, this._tripInfoView, RenderPosition.AFTER_BEGIN);
   }
 
   _renderTripCost() {
+    this._tripCostView = new TripCost(this._getPoints());
+
     const tripInfo = this._tripInfoContainer.querySelector(`.trip-info`);
     render(tripInfo, this._tripCostView, RenderPosition.BEFORE_END);
   }
 
   _toggleFormHandler(newOpenedPresenter) {
+    if (this._openedNewPointPresenter) {
+      this.newPoint.closeForm();
+      this._openedNewPointPresenter = false;
+      document.removeEventListener(`keydown`, this._onEscKeyDown);
+    }
     if (newOpenedPresenter) {
       if (this._openedPointPresenter) {
         this._openedPointPresenter.formToPoint();
@@ -173,8 +234,13 @@ class Trip {
   _onEscKeyDown(evt) {
     if (evt.key === `Escape`) {
       evt.preventDefault();
-      this._openedPointPresenter.reset();
-      this._openedPointPresenter.formToPoint();
+      if (this._openedPointPresenter) {
+        this._openedPointPresenter.reset();
+        this._openedPointPresenter.formToPoint();
+      } else if (this._openedNewPointPresenter) {
+        this._openedNewPointPresenter = false;
+        this.newPoint.closeForm();
+      }
       document.removeEventListener(`keydown`, this._onEscKeyDown);
     }
   }

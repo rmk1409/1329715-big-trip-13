@@ -28,14 +28,40 @@ const createPointTypeList = (point) => {
   }).join(``);
 };
 
-const createEditFormTemplate = (point) => {
+const getDestination = (point) => {
+  const {
+    info: {description = ``, photos = []},
+  } = point;
+  let res = ``;
+  if (description) {
+    res = `<section class="event__section  event__section--destination">
+              <h3 class="event__section-title  event__section-title--destination">Destination</h3>
+              <p class="event__destination-description">${description}</p>
+
+              <div class="event__photos-container">
+                <div class="event__photos-tape">
+                    ${photos.length > 0 ? photos.map((src) => `<img class="event__photo" src="${src}" alt="Event photo">`).join(``) : ``}
+                </div>
+              </div>
+            </section>`;
+  }
+
+  return res;
+};
+
+const getRollupButton = (isNew) => {
+  return isNew ? `` : ` <button class="event__rollup-btn" type="button">
+                          <span class="visually-hidden">Open event</span>
+                        </button>`;
+};
+
+const createEditFormTemplate = (point, isNewForm) => {
   const {
     id = ``,
-    type = ``,
+    type = TYPES[0],
     destination = ``,
     startDate, endDate,
     price = ``,
-    info: {description = ``, photos = []},
   } = point;
 
   const startDateAndTime = startDate ? startDate.format(`DD/MM/YY MM:HH`) : ``;
@@ -63,7 +89,7 @@ const createEditFormTemplate = (point) => {
                     <label class="event__label  event__type-output" for="event-destination-${id}">
                       ${type}
                     </label>
-                    <input class="event__input  event__input--destination" id="event-destination-${id}" type="text" name="event-destination" value="${destination}" list="destination-list-${id}">
+                    <input class="event__input  event__input--destination" id="event-destination-${id}" type="text" name="event-destination" value="${destination}" list="destination-list-${id}" required>
                     <datalist id="destination-list-${id}">
                         ${createDestinationlist()}
                     </datalist>
@@ -82,14 +108,12 @@ const createEditFormTemplate = (point) => {
                       <span class="visually-hidden">Price</span>
                       &euro;
                     </label>
-                    <input class="event__input  event__input--price" id="event-price-${id}" type="text" name="event-price" value="${price}">
+                    <input class="event__input  event__input--price" id="event-price-${id}" type="text" name="event-price" value="${price}" required>
                   </div>
 
                   <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-                  <button class="event__reset-btn" type="reset">Delete</button>
-                  <button class="event__rollup-btn" type="button">
-                    <span class="visually-hidden">Open event</span>
-                  </button>
+                  <button class="event__reset-btn" type="reset">${isNewForm ? `Cancel` : `Delete`}</button>
+                  ${getRollupButton(isNewForm)}
                 </header>
                 <section class="event__details">
                   <section class="event__section  event__section--offers">
@@ -99,39 +123,34 @@ const createEditFormTemplate = (point) => {
                     </div>` : ``}
                   </section>
 
-                  <section class="event__section  event__section--destination">
-                    <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-                    <p class="event__destination-description">${description}</p>
-
-                    <div class="event__photos-container">
-                      <div class="event__photos-tape">
-                          ${photos.length > 0 ? photos.map((src) => `<img class="event__photo" src="${src}" alt="Event photo">`).join(``) : ``}
-                      </div>
-                    </div>
-                  </section>
+                  ${getDestination(point)}
                 </section>
               </form>
             </li>`;
 };
 
 class EditForm extends SmartView {
-  constructor(point) {
+  constructor(point, isNewForm = false) {
     super(point);
+    this._isNewForm = isNewForm;
     this._startDatePicker = null;
     this._endDatePicker = null;
 
     this._submitHandler = this._submitHandler.bind(this);
     this._clickArrowHandler = this._clickArrowHandler.bind(this);
+    this._deleteHandler = this._deleteHandler.bind(this);
 
     this._pointTypeHandler = this._pointTypeHandler.bind(this);
     this._offerChooseHandler = this._offerChooseHandler.bind(this);
     this._changeDestinationHandler = this._changeDestinationHandler.bind(this);
     this._changeStartDateHandler = this._changeStartDateHandler.bind(this);
     this._changeEndDateHandler = this._changeEndDateHandler.bind(this);
+    this._changePriceHandler = this._changePriceHandler.bind(this);
 
     this.setPointTypeHandler();
     this.setOfferChooseHandler();
     this.setChangeDestinationHandler();
+    this.setChangePriceHandler();
     this._setDatePickers();
   }
 
@@ -145,31 +164,29 @@ class EditForm extends SmartView {
       this._endDatePicker = null;
     }
 
-    this._startDatePicker = flatpickr(
-        this.getElement().querySelector(`.event__input--time[name=event-start-time]`),
-        {
-          enableTime: true,
-          // eslint-disable-next-line camelcase
-          time_24hr: true,
-          dateFormat: `d/m/y H:i`,
-          defaultDate: this._state.startDate.toDate(),
-          onChange: this._changeStartDateHandler,
-          maxDate: this._state.endDate.add(-MIN_START_END_DATE_DIFFERENCE_IN_MINUTES, `minute`).toDate()
-        }
-    );
+    const startTimeSettings = {
+      enableTime: true,
+      // eslint-disable-next-line camelcase
+      time_24hr: true,
+      dateFormat: `d/m/y H:i`,
+      defaultDate: this._state.startDate.toDate(),
+      onChange: this._changeStartDateHandler,
+      maxDate: this._state.endDate.add(-MIN_START_END_DATE_DIFFERENCE_IN_MINUTES, `minute`).toDate(),
+    };
 
-    this._endDatePicker = flatpickr(
-        this.getElement().querySelector(`.event__input--time[name=event-end-time]`),
-        {
-          enableTime: true,
-          // eslint-disable-next-line camelcase
-          time_24hr: true,
-          dateFormat: `d/m/y H:i`,
-          defaultDate: this._state.endDate.toDate(),
-          onChange: this._changeEndDateHandler,
-          minDate: this._state.startDate.add(MIN_START_END_DATE_DIFFERENCE_IN_MINUTES, `minute`).toDate()
-        }
-    );
+    const endTimeSettings = {
+      enableTime: true,
+      // eslint-disable-next-line camelcase
+      time_24hr: true,
+      dateFormat: `d/m/y H:i`,
+      defaultDate: this._state.endDate.toDate(),
+      onChange: this._changeEndDateHandler,
+      minDate: this._state.startDate.add(MIN_START_END_DATE_DIFFERENCE_IN_MINUTES, `minute`).toDate(),
+    };
+
+    this._startDatePicker = flatpickr(this.getElement().querySelector(`.event__input--time[name=event-start-time]`), startTimeSettings);
+
+    this._endDatePicker = flatpickr(this.getElement().querySelector(`.event__input--time[name=event-end-time]`), endTimeSettings);
   }
 
   _changeStartDateHandler([userDate]) {
@@ -186,6 +203,25 @@ class EditForm extends SmartView {
     }
   }
 
+  _checkIsValidForm() {
+    const element = this.getElement();
+    const price = +element.querySelector(`.event__input--price`).value;
+    const destination = element.querySelector(`.event__input--destination`).value;
+    const saveButton = element.querySelector(`.event__save-btn`);
+    const isInputDataValid = Number.isInteger(price) && CITIES.indexOf(destination) !== -1;
+    saveButton.disabled = !isInputDataValid;
+  }
+
+  _changePriceHandler(evt) {
+    const newPrice = evt.target.value;
+    this.updateData({price: +newPrice}, false);
+    this._checkIsValidForm();
+  }
+
+  setChangePriceHandler() {
+    this.getElement().querySelector(`.event__input--price`).addEventListener(`input`, this._changePriceHandler);
+  }
+
   _changeDestinationHandler(evt) {
     evt.preventDefault();
     const newDestination = evt.target.value;
@@ -193,6 +229,7 @@ class EditForm extends SmartView {
     if ((this._state.destination !== newDestination) && pointInfo) {
       this.updateData({info: pointInfo, destination: newDestination});
     }
+    this._checkIsValidForm();
   }
 
   setChangeDestinationHandler() {
@@ -244,6 +281,11 @@ class EditForm extends SmartView {
     this._cb.clickArrow();
   }
 
+  _deleteHandler(evt) {
+    evt.preventDefault();
+    this._cb.clickDelete();
+  }
+
   setSubmitHandler(cb) {
     this._cb.submit = cb;
     this.getElement().addEventListener(`submit`, this._submitHandler);
@@ -255,16 +297,25 @@ class EditForm extends SmartView {
   }
 
   getTemplate() {
-    return createEditFormTemplate(this._state);
+    return createEditFormTemplate(this._state, this._isNewForm);
   }
 
   restoreHandlers() {
-    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._clickArrowHandler);
+    const rollupButton = this.getElement().querySelector(`.event__rollup-btn`);
+    if (rollupButton) {
+      rollupButton.addEventListener(`click`, this._clickArrowHandler);
+    }
     this.getElement().addEventListener(`submit`, this._submitHandler);
     this.getElement().querySelector(`.event__type-list`).addEventListener(`change`, this._pointTypeHandler);
     this.setOfferChooseHandler();
     this.setChangeDestinationHandler();
     this._setDatePickers();
+    this.setChangePriceHandler();
+  }
+
+  setDeleteButtonHandler(cb) {
+    this._cb.clickDelete = cb;
+    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, this._deleteHandler);
   }
 }
 

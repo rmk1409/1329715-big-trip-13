@@ -1,5 +1,5 @@
 import Offer from "./offer";
-import {getDateDifference} from "../utils/point";
+import {getDateDifference} from "../util/point";
 import SmartView from './smart-view';
 
 const createTripEventsItemTemplate = (point) => {

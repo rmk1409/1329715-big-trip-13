@@ -1,4 +1,4 @@
-import {getRandomNumber, getRandomValueOfArray} from "../utils/common";
+import {getRandomNumber, getRandomValueOfArray} from "../util/common";
 import {getAvailableOffers, getOffers} from "./offer";
 import {getInfo} from "./info";
 import dayjs from "dayjs";
@@ -7,7 +7,7 @@ const MIN_POINT_PRICE = 10;
 const MAX_POINT_PRICE = 1000;
 
 
-const MIN_START_DATE_IN_MINUTES = 0;
+const MIN_START_DATE_IN_MINUTES = -5000;
 const MAX_START_DATE_IN_MINUTES = 5000;
 
 const MIN_POINT_DURATION_IN_MIN = 1;
@@ -52,4 +52,4 @@ const generatePoint = () => {
   return point;
 };
 
-export {generatePoint, CITIES, TYPES};
+export {generatePoint, CITIES, TYPES, getNextId};
