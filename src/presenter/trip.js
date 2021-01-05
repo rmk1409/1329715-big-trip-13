@@ -1,15 +1,15 @@
 import Menu from '../view/menu';
-import Filters from '../view/filters';
 import TripEventsList from '../view/trip-events-list';
 import Sort from '../view/sort';
 import TripInfo from '../view/trip-info';
 import TripCost from '../view/trip-cost';
-import {render, RenderPosition} from '../util/render';
+import {remove, render, RenderPosition} from '../util/render';
 import ListEmpty from '../view/list-empty';
 import {Point as PointPresenter} from './point';
 import Observer from "../util/pattern/observer/observer";
 import {ActionType, UpdateType} from "../util/const";
 import NewPoint from "./newPoint";
+import {FilterFunctions, FilterType} from "../model/filter";
 
 const SortMode = {
   DEFAULT: `sort-day`,
@@ -23,15 +23,17 @@ sortMap.set(SortMode.TIME, (a, b) => a.endDate.diff(a.startDate) - b.endDate.dif
 sortMap.set(SortMode.PRICE, (a, b) => a.price - b.price);
 
 class Trip extends Observer {
-  constructor(tripInfoContainer, pointsInfoContainer, pointsModel) {
+  constructor(tripInfoContainer, pointsInfoContainer, pointsModel, filterModel) {
     super(pointsModel);
+
+    this._filterModel = filterModel;
+    this._filterModel.addObserver(this);
 
     this._tripInfoContainer = tripInfoContainer;
     this._pointsInfoContainer = pointsInfoContainer;
 
     this._menuView = new Menu();
-    // this._filterView = new Filters();
-    this._sortView = new Sort();
+    this._sortView = null;
     this._pointListView = new TripEventsList();
     this._noPointsView = new ListEmpty();
 
@@ -49,19 +51,27 @@ class Trip extends Observer {
 
     this._newPointHandler = this._newPointHandler.bind(this);
 
-    this._renderTripEventsList();
-    this._pointsListContainer = this._pointsInfoContainer.querySelector(`.trip-events__list`);
-
-    this.newPoint = new NewPoint(this._pointsListContainer, this._changePointsModelHandler);
     this._openedNewPointPresenter = false;
   }
 
   init() {
-    this._renderTrip();
+    this._renderTripEventsList();
+    this._pointsListContainer = this._pointsInfoContainer.querySelector(`.trip-events__list`);
+
+    this.newPoint = new NewPoint(this._pointsListContainer, this._changePointsModelHandler, this._toggleFormHandler);
+
+    this._renderMenu();
+    this._renderTripInfoAndCost();
+
+    this._renderBoard();
+
     this._tripInfoContainer.querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, this._newPointHandler);
   }
 
   _newPointHandler() {
+    this._currentSortMode = SortMode.DEFAULT;
+    this._filterModel.state = FilterType.EVERYTHING;
+
     if (this._openedPointPresenter) {
       this._openedPointPresenter.formToPoint();
       document.removeEventListener(`keydown`, this._onEscKeyDown);
@@ -75,27 +85,17 @@ class Trip extends Observer {
     }
   }
 
-  _renderTrip() {
-    this._renderMenu();
-    // this._renderFilters();
-    this._renderSort();
-
-    this._renderTripInfoAndCost();
-
-    this._renderPoints(this._getPoints());
-  }
-
   _renderMenu() {
     const menuHeader = this._tripInfoContainer.querySelector(`.trip-controls h2:first-child`);
     render(menuHeader, this._menuView, RenderPosition.AFTER_END);
   }
 
-  // _renderFilters() {
-  //   const filterHeader = this._tripInfoContainer.querySelector(`.trip-controls h2:nth-of-type(2)`);
-  //   render(filterHeader, this._filterView, RenderPosition.AFTER_END);
-  // }
-
   _renderSort() {
+    if (this._sortView) {
+      remove(this._sortView);
+      this._sortView = null;
+    }
+    this._sortView = new Sort(this._currentSortMode);
     this._sortView.setSortChangeHandler(this._sortChangeHandler);
     const tripSortHeader = this._pointsInfoContainer.querySelector(`h2:first-child`);
     render(tripSortHeader, this._sortView, RenderPosition.AFTER_END);
@@ -103,18 +103,17 @@ class Trip extends Observer {
 
   _getPoints() {
     const points = this._subject.state.slice();
-    points.sort(sortMap.get(this._currentSortMode));
-    return points;
+    const filterType = this._filterModel.state;
+    const filteredPoints = FilterFunctions.get(filterType)(points);
+    filteredPoints.sort(sortMap.get(this._currentSortMode));
+    return filteredPoints;
   }
 
   _sortChangeHandler(sortType) {
     if (Object.values(SortMode).indexOf(sortType) !== -1 && this._isAnotherMode(sortType)) {
       this._currentSortMode = sortType;
-      const element = this._sortView.getElement();
-      element.querySelector(`input[name=trip-sort]:checked`).checked = false;
-      element.querySelector(`input[id=${sortType}]`).checked = true;
-
-      this._renderPoints(this._getPoints());
+      this._clearPointsBoard();
+      this._renderBoard();
     }
   }
 
@@ -128,12 +127,21 @@ class Trip extends Observer {
         this._pointPresenters.get(updatedPoint.id).update(updatedPoint);
         break;
       case UpdateType.MINOR:
+        this._clearPointsBoard();
+        this._renderBoard();
         break;
       case UpdateType.MAJOR:
-        this._renderPoints(this._getPoints());
+        this._clearPointsBoard(true);
+        this._renderBoard();
         this._renderTripInfoAndCost();
         break;
     }
+  }
+
+  _renderBoard() {
+    this._renderPoints(this._getPoints());
+    this._renderSort();
+
   }
 
   _changePointsModelHandler(updatedPoint, actionType, updateType) {
@@ -154,15 +162,21 @@ class Trip extends Observer {
     render(this._pointsInfoContainer, this._pointListView, RenderPosition.BEFORE_END);
   }
 
-  _clearPointsList() {
+  _clearPointsBoard(resetSort) {
     this._pointsInfoContainer.querySelector(`.trip-events__list`).innerHTML = ``;
     this._openedPointPresenter = null;
     document.removeEventListener(`keydown`, this._onEscKeyDown);
     this._pointPresenters.clear();
+    document.querySelectorAll(`.flatpickr-calendar`).forEach((e) => e.remove());
+
+    if (resetSort) {
+      this._currentSortMode = SortMode.DEFAULT;
+    }
+
+    remove(this._noPointsView);
   }
 
   _renderPoints(points) {
-    this._clearPointsList();
     if (points.length) {
       points.forEach((point) => this._renderPoint(point));
     } else {
@@ -190,12 +204,12 @@ class Trip extends Observer {
   }
 
   _renderTripInfo() {
-    this._tripInfoView = new TripInfo(this._subject.state);
+    this._tripInfoView = new TripInfo(this._getPoints());
     render(this._tripInfoContainer, this._tripInfoView, RenderPosition.AFTER_BEGIN);
   }
 
   _renderTripCost() {
-    this._tripCostView = new TripCost(this._subject.state);
+    this._tripCostView = new TripCost(this._getPoints());
 
     const tripInfo = this._tripInfoContainer.querySelector(`.trip-info`);
     render(tripInfo, this._tripCostView, RenderPosition.BEFORE_END);

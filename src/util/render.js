@@ -3,7 +3,7 @@ import AbstractView from "../view/abstract-view";
 const RenderPosition = {
   AFTER_BEGIN: `afterbegin`,
   BEFORE_END: `beforeend`,
-  AFTER_END: `afterend`
+  AFTER_END: `afterend`,
 };
 
 const render = (container, newElement, place) => {
@@ -53,4 +53,12 @@ const replace = (newChild, oldChild) => {
   parent.replaceChild(newChild, oldChild);
 };
 
-export {render, createElement, replace, RenderPosition};
+const remove = (component) => {
+  if (!(component instanceof AbstractView)) {
+    throw new Error(`Can remove only components`);
+  }
+  component.getElement().remove();
+  component.removeElement();
+};
+
+export {render, createElement, replace, RenderPosition, remove};

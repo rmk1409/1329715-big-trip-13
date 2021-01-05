@@ -2,7 +2,7 @@ import EditForm from "../view/edit-form";
 import {ActionType, UpdateType} from "../util/const";
 import {TYPES} from "../mock/point";
 import dayjs from "dayjs";
-import {render, replace} from "../util/render";
+import {render} from "../util/render";
 
 
 const EMPTY_POINT = {
@@ -14,10 +14,10 @@ const EMPTY_POINT = {
 };
 
 export default class NewPoint {
-  constructor(pointsListContainer, changePointsModelHandler) {
+  constructor(pointsListContainer, changePointsModelHandler, toggleFormHandler) {
     this._pointsListContainer = pointsListContainer;
     this._changePointsModelHander = changePointsModelHandler;
-    this.init();
+    this._toggleFormHandler = toggleFormHandler;
 
     this._submitHandler = this._submitHandler.bind(this);
   }
@@ -31,16 +31,12 @@ export default class NewPoint {
 
   _setHandlers() {
     this._editFormComponent.setSubmitHandler(this._submitHandler);
-    this._editFormComponent.setDeleteButtonHandler(this._clickCancelButton);
+    this._editFormComponent.setDeleteButtonHandler(this._toggleFormHandler);
   }
 
   _submitHandler(point) {
     this.closeForm();
     this._changePointsModelHander(point, ActionType.ADD, UpdateType.MAJOR);
-  }
-
-  _clickCancelButton() {
-    this.closeForm();
   }
 
   closeForm() {

@@ -1,4 +1,6 @@
 import dayjs from "dayjs";
+import Subject from "../util/pattern/observer/subject";
+import {UpdateType} from "../util/const";
 
 const FilterType = {
   EVERYTHING: `everything`,
@@ -8,22 +10,33 @@ const FilterType = {
 
 const FilterFunctions = new Map();
 FilterFunctions.set(FilterType.EVERYTHING, (points) => points);
-FilterFunctions.set(FilterType.FUTURE, (points) => points.filter((point) => dayjs().isAfter(point.startDate)));
-FilterFunctions.set(FilterType.PAST, (points) => points.filter((point) => dayjs().isBefore(point.startDate)));
+FilterFunctions.set(FilterType.FUTURE, (points) => {
+  const now = dayjs();
+  return points.filter((point) => now.isSame(point.startDate) || now.isBefore(point.startDate));
+});
+FilterFunctions.set(FilterType.PAST, (points) => {
+  const now = dayjs();
+  return points.filter((point) => now.isSame(point.endDate) || now.isAfter(point.endDate));
+});
 
-class Filter {
+class Filter extends Subject {
   constructor() {
-    this._activeFilter = FilterType.EVERYTHING;
+    super(FilterType.EVERYTHING);
   }
 
-  get activeFilter() {
-    return this._activeFilter;
-  }
-
-  set activeFilter(newFilter) {
-    if (newFilter !== this._activeFilter) {
-      this._activeFilter = newFilter;
+  set state(newFilter) {
+    if (newFilter !== this._state) {
+      this._state = newFilter;
+      this.notifyAllObservers();
     }
+  }
+
+  notifyAllObservers() {
+    this._observers.forEach((observer) => observer.update(UpdateType.MAJOR));
+  }
+
+  get state() {
+    return this._state;
   }
 }
 

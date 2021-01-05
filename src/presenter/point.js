@@ -44,13 +44,11 @@ class Point {
     this._point = point;
 
     const previousEvtComponent = this._evtComponent;
-    const previousFormComponent = this._editFormComponent;
 
     this._createComponents();
     this._setHandlersToComponents();
 
     replace(this._evtComponent, previousEvtComponent);
-    replace(this._editFormComponent, previousFormComponent);
   }
 
   _clickDeleteButton() {
@@ -66,9 +64,20 @@ class Point {
     this._pointToForm();
   }
 
+  _getUpdateType(newPoint) {
+    let result = UpdateType.PATCH;
+    if (newPoint.destination !== this._point.destination
+      || newPoint.startDate !== this._point.startDate
+      || newPoint.endDate !== this._point.endDate
+      || newPoint.price !== this._point.price) {
+      result = UpdateType.MAJOR;
+    }
+    return result;
+  }
+
   _submitHandler(point) {
     this.formToPoint();
-    this._changePointsModelHander(point, ActionType.UPDATE, UpdateType.MAJOR);
+    this._changePointsModelHander(point, ActionType.UPDATE, this._getUpdateType(point));
   }
 
   _clickFormArrowHandler() {
