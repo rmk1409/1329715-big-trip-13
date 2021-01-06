@@ -9,7 +9,7 @@ import {Point as PointPresenter} from './point';
 import Observer from "../util/pattern/observer/observer";
 import {ActionType, UpdateType} from "../util/const";
 import NewPoint from "./newPoint";
-import {FilterFunctions, FilterType} from "../model/filter";
+import {FilterFunction, FilterType} from "../model/filter";
 
 const SortMode = {
   DEFAULT: `sort-day`,
@@ -104,7 +104,7 @@ class Trip extends Observer {
   _getPoints() {
     const points = this._subject.state.slice();
     const filterType = this._filterModel.state;
-    const filteredPoints = FilterFunctions.get(filterType)(points);
+    const filteredPoints = FilterFunction.get(filterType)(points);
     filteredPoints.sort(sortMap.get(this._currentSortMode));
     return filteredPoints;
   }

@@ -8,13 +8,13 @@ const FilterType = {
   PAST: `past`,
 };
 
-const FilterFunctions = new Map();
-FilterFunctions.set(FilterType.EVERYTHING, (points) => points);
-FilterFunctions.set(FilterType.FUTURE, (points) => {
+const FilterFunction = new Map();
+FilterFunction.set(FilterType.EVERYTHING, (points) => points);
+FilterFunction.set(FilterType.FUTURE, (points) => {
   const now = dayjs();
   return points.filter((point) => now.isSame(point.startDate) || now.isBefore(point.startDate));
 });
-FilterFunctions.set(FilterType.PAST, (points) => {
+FilterFunction.set(FilterType.PAST, (points) => {
   const now = dayjs();
   return points.filter((point) => now.isSame(point.endDate) || now.isAfter(point.endDate));
 });
@@ -40,4 +40,4 @@ class Filter extends Subject {
   }
 }
 
-export {Filter, FilterFunctions, FilterType};
+export {Filter, FilterFunction, FilterType};

@@ -1,9 +1,9 @@
 import AbstractView from "./abstract-view";
-import {FilterFunctions, FilterType} from "../model/filter";
+import {FilterFunction, FilterType} from "../model/filter";
 
 const createFiltersTemplate = (points, currentChosenFilter) => {
-  const isFuturePresent = FilterFunctions.get(FilterType.FUTURE)(points).length;
-  const isPastPresent = FilterFunctions.get(FilterType.PAST)(points).length;
+  const isFuturePresent = FilterFunction.get(FilterType.FUTURE)(points).length;
+  const isPastPresent = FilterFunction.get(FilterType.PAST)(points).length;
 
   const isEverythingChosen = currentChosenFilter === FilterType.EVERYTHING;
   const isFutureChosen = currentChosenFilter === FilterType.FUTURE;
