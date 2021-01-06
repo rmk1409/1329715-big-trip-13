@@ -1,6 +1,7 @@
 import {remove, render, RenderPosition} from "../util/render";
 import {Filters as FilterView} from "../view/filters";
 import Observer from "../util/pattern/observer/observer";
+import {UpdateType} from "../util/const";
 
 class Filter extends Observer {
   constructor(container, model, pointsModel) {
@@ -25,7 +26,11 @@ class Filter extends Observer {
     this._filterModel.state = evt.target.value;
   }
 
-  update() {
+  update(updateType) {
+    if (updateType === UpdateType.PATCH) {
+      return;
+    }
+
     remove(this._filterView);
 
     this._filterView = new FilterView(this._pointsModel.state, this._filterModel.state);
