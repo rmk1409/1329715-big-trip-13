@@ -4,13 +4,14 @@ import {TYPES} from "../mock/point";
 import dayjs from "dayjs";
 import {render} from "../util/render";
 
+const MIN_DURATION_IN_MIN = 5;
 
 const EMPTY_POINT = {
   info: {},
   type: TYPES[0],
   offers: [],
   startDate: dayjs(),
-  endDate: dayjs().add(5, `minute`),
+  endDate: dayjs().add(MIN_DURATION_IN_MIN, `minute`),
 };
 
 export default class NewPoint {
