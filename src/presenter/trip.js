@@ -69,7 +69,9 @@ class Trip extends Observer {
   }
 
   _newPointHandler() {
-    this._currentSortMode = SortMode.DEFAULT;
+    if (this._currentSortMode !== SortMode.DEFAULT) {
+      this._sortChangeHandler(SortMode.DEFAULT);
+    }
     this._filterModel.state = FilterType.EVERYTHING;
 
     if (this._openedPointPresenter) {
