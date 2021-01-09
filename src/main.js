@@ -18,5 +18,10 @@ for (let i = 0; i < ITEM_COUNT; i++) {
 const pointsModel = new PointsModel(points);
 const filterModel = new FilterModel();
 
-new TripPresenter(tripMain, tripEvents, pointsModel, filterModel).init();
-new FilterPresenter(filterHeader, pointsModel, filterModel).init();
+const tripPresenter = new TripPresenter(tripMain, tripEvents, pointsModel, filterModel);
+const filterPresenter = new FilterPresenter(filterHeader, pointsModel, filterModel);
+tripPresenter.init();
+filterPresenter.init();
+
+const newPointButton = tripMain.querySelector(`.trip-main__event-add-btn`);
+newPointButton.addEventListener(`click`, tripPresenter.openNewPointForm);

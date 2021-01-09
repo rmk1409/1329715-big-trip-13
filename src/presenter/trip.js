@@ -36,16 +36,17 @@ class Trip {
 
     this._openedPointPresenter = null;
 
-    this._toggleFormHandler = this._toggleFormHandler.bind(this);
+    this._openedPointPresenterSetter = this._openedPointPresenterSetter.bind(this);
     this._sortChangeHandler = this._sortChangeHandler.bind(this);
     this._onEscKeyDown = this._onEscKeyDown.bind(this);
     this._changePointsModelHandler = this._changePointsModelHandler.bind(this);
+    this._closeForm = this._closeForm.bind(this);
     this._currentSortMode = SortMode.DEFAULT;
     this._pointPresenters = new Map();
 
-    this._newPointHandler = this._newPointHandler.bind(this);
+    this.openNewPointForm = this.openNewPointForm.bind(this);
 
-    this._openedNewPointPresenter = false;
+    this._isOpenedNewPointPresenter = false;
 
     this.update = this.update.bind(this);
 
@@ -59,32 +60,33 @@ class Trip {
     this._renderTripEventsList();
     this._pointsListContainer = this._pointsInfoContainer.querySelector(`.trip-events__list`);
 
-    this.newPoint = new NewPoint(this._pointsListContainer, this._changePointsModelHandler, this._toggleFormHandler);
+    this.newPoint = new NewPoint(this._pointsListContainer, this._changePointsModelHandler, this._closeForm);
 
     this._renderMenu();
     this._renderTripInfoAndCost();
 
     this._renderBoard();
-
-    this._tripInfoContainer.querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, this._newPointHandler);
   }
 
-  _newPointHandler() {
+  openNewPointForm() {
     if (this._currentSortMode !== SortMode.DEFAULT) {
       this._sortChangeHandler(SortMode.DEFAULT);
     }
     this._filterModel.activeFilter = FilterType.EVERYTHING;
 
     if (this._openedPointPresenter) {
-      this._openedPointPresenter.formToPoint();
+      this._openedPointPresenter.toggleFormToPoint();
       document.removeEventListener(`keydown`, this._onEscKeyDown);
       this._openedPointPresenter = null;
     }
 
-    if (!this._openedNewPointPresenter) {
+    if (!this._isOpenedNewPointPresenter) {
       this.newPoint.init();
-      this._openedNewPointPresenter = true;
+      this._isOpenedNewPointPresenter = true;
       document.addEventListener(`keydown`, this._onEscKeyDown);
+
+      const newPointButton = this._tripInfoContainer.querySelector(`.trip-main__event-add-btn`);
+      newPointButton.disabled = true;
     }
   }
 
@@ -188,7 +190,7 @@ class Trip {
   }
 
   _renderPoint(point) {
-    const presenter = new PointPresenter(this._pointsListContainer, this._toggleFormHandler, this._changePointsModelHandler);
+    const presenter = new PointPresenter(this._pointsListContainer, this._openedPointPresenterSetter, this._changePointsModelHandler);
     presenter.init(point);
     this._pointPresenters.set(point.id, presenter);
   }
@@ -218,17 +220,9 @@ class Trip {
     render(tripInfo, this._tripCostView, RenderPosition.BEFORE_END);
   }
 
-  _toggleFormHandler(newOpenedPresenter) {
-    if (this._openedNewPointPresenter) {
-      this.newPoint.closeForm();
-      this._openedNewPointPresenter = false;
-      document.removeEventListener(`keydown`, this._onEscKeyDown);
-    }
+  _openedPointPresenterSetter(newOpenedPresenter) {
     if (newOpenedPresenter) {
-      if (this._openedPointPresenter) {
-        this._openedPointPresenter.formToPoint();
-        document.removeEventListener(`keydown`, this._onEscKeyDown);
-      }
+      this._closeForm();
       document.addEventListener(`keydown`, this._onEscKeyDown);
     }
     this._openedPointPresenter = newOpenedPresenter;
@@ -237,15 +231,21 @@ class Trip {
   _onEscKeyDown(evt) {
     if (evt.key === `Escape`) {
       evt.preventDefault();
-      if (this._openedPointPresenter) {
-        this._openedPointPresenter.reset();
-        this._openedPointPresenter.formToPoint();
-      } else if (this._openedNewPointPresenter) {
-        this._openedNewPointPresenter = false;
-        this.newPoint.closeForm();
-      }
-      document.removeEventListener(`keydown`, this._onEscKeyDown);
+      this._closeForm();
     }
+  }
+
+  _closeForm() {
+    if (this._isOpenedNewPointPresenter) {
+      this.newPoint.closeForm();
+      this._isOpenedNewPointPresenter = false;
+      this._tripInfoContainer.querySelector(`.trip-main__event-add-btn`).disabled = false;
+    } else if (this._openedPointPresenter) {
+      this._openedPointPresenter.resetIntermediateState();
+      this._openedPointPresenter.toggleFormToPoint();
+      this._openedPointPresenter = null;
+    }
+    document.removeEventListener(`keydown`, this._onEscKeyDown);
   }
 }
 

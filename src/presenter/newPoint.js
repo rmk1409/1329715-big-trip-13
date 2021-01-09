@@ -15,10 +15,10 @@ const EMPTY_POINT = {
 };
 
 export default class NewPoint {
-  constructor(pointsListContainer, changePointsModelHandler, toggleFormHandler) {
+  constructor(pointsListContainer, changePointsModelHandler, cancelClickHandler) {
     this._pointsListContainer = pointsListContainer;
     this._changePointsModelHander = changePointsModelHandler;
-    this._toggleFormHandler = toggleFormHandler;
+    this._cancelClickHandler = cancelClickHandler;
 
     this._submitHandler = this._submitHandler.bind(this);
   }
@@ -32,7 +32,7 @@ export default class NewPoint {
 
   _setHandlers() {
     this._editFormComponent.setSubmitHandler(this._submitHandler);
-    this._editFormComponent.setDeleteButtonHandler(this._toggleFormHandler);
+    this._editFormComponent.setDeleteButtonHandler(this._cancelClickHandler);
   }
 
   _submitHandler(point) {

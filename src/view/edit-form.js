@@ -271,9 +271,19 @@ class EditForm extends SmartView {
     }
   }
 
+  setSubmitHandler(cb) {
+    this._cb.submit = cb;
+    this.getElement().addEventListener(`submit`, this._submitHandler);
+  }
+
   _submitHandler(evt) {
     evt.preventDefault();
     this._cb.submit(this._point);
+  }
+
+  setClickArrowHandler(cb) {
+    this._cb.clickArrow = cb;
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._clickArrowHandler);
   }
 
   _clickArrowHandler(evt) {
@@ -281,19 +291,14 @@ class EditForm extends SmartView {
     this._cb.clickArrow();
   }
 
+  setDeleteButtonHandler(cb) {
+    this._cb.clickDelete = cb;
+    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, this._deleteHandler);
+  }
+
   _deleteHandler(evt) {
     evt.preventDefault();
     this._cb.clickDelete();
-  }
-
-  setSubmitHandler(cb) {
-    this._cb.submit = cb;
-    this.getElement().addEventListener(`submit`, this._submitHandler);
-  }
-
-  setClickArrowHandler(cb) {
-    this._cb.clickArrow = cb;
-    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._clickArrowHandler);
   }
 
   getTemplate() {
@@ -311,11 +316,6 @@ class EditForm extends SmartView {
     this.setChangeDestinationHandler();
     this._setDatePickers();
     this.setChangePriceHandler();
-  }
-
-  setDeleteButtonHandler(cb) {
-    this._cb.clickDelete = cb;
-    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, this._deleteHandler);
   }
 }
 
