@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import Subject from "../util/pattern/observer/subject";
+import Observable from "../util/pattern/observer/observable";
 import {UpdateType} from "../util/const";
 
 const FilterType = {
@@ -19,24 +19,21 @@ FilterFunction.set(FilterType.PAST, (points) => {
   return points.filter((point) => now.isSame(point.endDate) || now.isAfter(point.endDate));
 });
 
-class Filter extends Subject {
+class Filter extends Observable {
   constructor() {
-    super(FilterType.EVERYTHING);
+    super();
+    this._activeFilter = FilterType.EVERYTHING;
   }
 
-  set state(newFilter) {
-    if (newFilter !== this._state) {
-      this._state = newFilter;
-      this.notifyAllObservers();
+  get activeFilter() {
+    return this._activeFilter;
+  }
+
+  set activeFilter(newFilter) {
+    if (newFilter !== this._activeFilter) {
+      this._activeFilter = newFilter;
+      super.notifyAllObservers(UpdateType.MAJOR);
     }
-  }
-
-  notifyAllObservers() {
-    this._observers.forEach((observer) => observer.update(UpdateType.MAJOR));
-  }
-
-  get state() {
-    return this._state;
   }
 }
 

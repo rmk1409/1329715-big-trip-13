@@ -62,7 +62,7 @@ class TripEventsItem extends SmartView {
   }
 
   getTemplate() {
-    return createTripEventsItemTemplate(this._state);
+    return createTripEventsItemTemplate(this._point);
   }
 
   setClickArrowHandler(cb) {

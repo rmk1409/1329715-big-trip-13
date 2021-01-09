@@ -4,7 +4,7 @@ import {Points as PointsModel} from "./model/points";
 import {Filter as FilterPresenter} from "./presenter/filter";
 import {Filter as FilterModel} from "./model/filter";
 
-const ITEM_COUNT = 2;
+const ITEM_COUNT = 20;
 
 const tripMain = document.querySelector(`.trip-main`);
 const tripEvents = document.querySelector(`.trip-events`);
@@ -19,4 +19,4 @@ const pointsModel = new PointsModel(points);
 const filterModel = new FilterModel();
 
 new TripPresenter(tripMain, tripEvents, pointsModel, filterModel).init();
-new FilterPresenter(filterHeader, filterModel, pointsModel).init();
+new FilterPresenter(filterHeader, pointsModel, filterModel).init();

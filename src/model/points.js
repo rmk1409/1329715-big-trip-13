@@ -1,33 +1,34 @@
-import Subject from "../util/pattern/observer/subject";
+import Observable from "../util/pattern/observer/observable";
 import {UpdateType} from "../util/const";
 
-class Points extends Subject {
-  constructor(tripPoints) {
-    super(tripPoints);
+class Points extends Observable {
+  constructor(points) {
+    super();
+    this._points = points;
   }
 
-  updatePoint(updatedPoint, updateType) {
-    const index = this._state.findIndex(({id}) => id === updatedPoint.id);
-    this._state[index] = updatedPoint;
-
-    this.notifyAllObservers(updatedPoint, updateType);
+  get points() {
+    return this._points;
   }
 
-  addPoint(newTripPoint) {
-    this._state.push(newTripPoint);
+  addPoint(newPoint) {
+    this._points.push(newPoint);
 
-    this.notifyAllObservers(newTripPoint, UpdateType.MAJOR);
+    super.notifyAllObservers(UpdateType.MAJOR);
   }
 
-  deletePoint(tripPoint) {
-    const index = this._state.findIndex(({id}) => tripPoint.id === id);
-    this._state.splice(index, 1);
+  updatePoint(updateType, updatedPoint) {
+    const index = this._points.findIndex(({id}) => id === updatedPoint.id);
+    this._points[index] = updatedPoint;
 
-    this.notifyAllObservers(tripPoint, UpdateType.MAJOR);
+    super.notifyAllObservers(updateType, updatedPoint);
   }
 
-  notifyAllObservers(updatedPoint, updateType) {
-    this._observers.forEach((observer) => observer.update(updateType, updatedPoint));
+  deletePoint(point) {
+    const index = this._points.findIndex(({id}) => point.id === id);
+    this._points.splice(index, 1);
+
+    super.notifyAllObservers(UpdateType.MAJOR);
   }
 }
 

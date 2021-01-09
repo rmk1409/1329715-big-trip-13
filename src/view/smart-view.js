@@ -4,7 +4,7 @@ import {getAvailableOffers} from '../mock/offer';
 export default class SmartView extends AbstractView {
   constructor(point) {
     super();
-    this._state = Object.assign({}, point);
+    this._point = Object.assign({}, point);
   }
 
   updateElement() {
@@ -17,11 +17,11 @@ export default class SmartView extends AbstractView {
   }
 
   updateData(changedData, needReload = true) {
-    this._state = Object.assign({}, this._state, changedData);
+    this._point = Object.assign({}, this._point, changedData);
     if (needReload) {
       this.updateElement();
     }
-    this._state.availableOffers = getAvailableOffers(this._state.type);
+    this._point.availableOffers = getAvailableOffers(this._point.type);
   }
 
   restoreHandlers() {

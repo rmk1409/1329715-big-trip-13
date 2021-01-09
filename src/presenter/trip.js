@@ -6,7 +6,6 @@ import TripCost from '../view/trip-cost';
 import {remove, render, RenderPosition} from '../util/render';
 import ListEmpty from '../view/list-empty';
 import {Point as PointPresenter} from './point';
-import Observer from "../util/pattern/observer/observer";
 import {ActionType, UpdateType} from "../util/const";
 import NewPoint from "./newPoint";
 import {FilterFunction, FilterType} from "../model/filter";
@@ -22,13 +21,8 @@ sortMap.set(SortMode.DEFAULT, (a, b) => a.startDate.isBefore(b.startDate) ? -1 :
 sortMap.set(SortMode.TIME, (a, b) => a.endDate.diff(a.startDate) - b.endDate.diff(b.startDate));
 sortMap.set(SortMode.PRICE, (a, b) => a.price - b.price);
 
-class Trip extends Observer {
+class Trip {
   constructor(tripInfoContainer, pointsInfoContainer, pointsModel, filterModel) {
-    super(pointsModel);
-
-    this._filterModel = filterModel;
-    this._filterModel.addObserver(this);
-
     this._tripInfoContainer = tripInfoContainer;
     this._pointsInfoContainer = pointsInfoContainer;
 
@@ -52,6 +46,13 @@ class Trip extends Observer {
     this._newPointHandler = this._newPointHandler.bind(this);
 
     this._openedNewPointPresenter = false;
+
+    this.update = this.update.bind(this);
+
+    this._pointsModel = pointsModel;
+    this._filterModel = filterModel;
+    this._pointsModel.addObserver(this.update);
+    this._filterModel.addObserver(this.update);
   }
 
   init() {
@@ -72,7 +73,7 @@ class Trip extends Observer {
     if (this._currentSortMode !== SortMode.DEFAULT) {
       this._sortChangeHandler(SortMode.DEFAULT);
     }
-    this._filterModel.state = FilterType.EVERYTHING;
+    this._filterModel.activeFilter = FilterType.EVERYTHING;
 
     if (this._openedPointPresenter) {
       this._openedPointPresenter.formToPoint();
@@ -104,8 +105,8 @@ class Trip extends Observer {
   }
 
   _getPoints() {
-    const points = this._subject.state.slice();
-    const filterType = this._filterModel.state;
+    const points = this._pointsModel.points.slice();
+    const filterType = this._filterModel.activeFilter;
     const filteredPoints = FilterFunction.get(filterType)(points);
     filteredPoints.sort(sortMap.get(this._currentSortMode));
     return filteredPoints;
@@ -149,13 +150,13 @@ class Trip extends Observer {
   _changePointsModelHandler(updatedPoint, actionType, updateType) {
     switch (actionType) {
       case ActionType.ADD:
-        this._subject.addPoint(updatedPoint, updateType);
+        this._pointsModel.addPoint(updatedPoint, updateType);
         break;
       case ActionType.UPDATE:
-        this._subject.updatePoint(updatedPoint, updateType);
+        this._pointsModel.updatePoint(updatedPoint, updateType);
         break;
       case ActionType.DELETE:
-        this._subject.deletePoint(updatedPoint, updateType);
+        this._pointsModel.deletePoint(updatedPoint, updateType);
         break;
     }
   }
