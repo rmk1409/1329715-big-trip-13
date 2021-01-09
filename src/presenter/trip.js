@@ -136,19 +136,18 @@ class Trip {
   _renderBoard() {
     this._renderPoints(this._getPoints());
     this._renderSort();
-
   }
 
   _changePointsModelHandler(updatedPoint, actionType, updateType) {
     switch (actionType) {
       case ActionType.ADD:
-        this._pointsModel.addPoint(updatedPoint, updateType);
+        this._pointsModel.addPoint(updatedPoint);
         break;
       case ActionType.UPDATE:
-        this._pointsModel.updatePoint(updatedPoint, updateType);
+        this._pointsModel.updatePoint(updateType, updatedPoint);
         break;
       case ActionType.DELETE:
-        this._pointsModel.deletePoint(updatedPoint, updateType);
+        this._pointsModel.deletePoint(updatedPoint);
         break;
     }
   }
@@ -199,12 +198,12 @@ class Trip {
   }
 
   _renderTripInfo() {
-    this._tripInfoView = new TripInfo(this._getPoints());
+    this._tripInfoView = new TripInfo(this._pointsModel.points.sort(sortMap.get(SortMode.DEFAULT)));
     render(this._tripInfoContainer, this._tripInfoView, RenderPosition.AFTER_BEGIN);
   }
 
   _renderTripCost() {
-    this._tripCostView = new TripCost(this._getPoints());
+    this._tripCostView = new TripCost(this._pointsModel.points);
 
     const tripInfo = this._tripInfoContainer.querySelector(`.trip-info`);
     render(tripInfo, this._tripCostView, RenderPosition.BEFORE_END);
@@ -241,12 +240,18 @@ class Trip {
   hide() {
     this._pointListView.hide();
     this._sortView.hide();
+    this._pointsModel.removeObserver(this.update);
+    this._filterModel.removeObserver(this.update);
+    this._closeForm();
   }
 
   show() {
     this._pointListView.show();
-    this._sortChangeHandler(SortMode.DEFAULT);
     this._sortView.show();
+    this._clearPointsBoard(true);
+    this._renderBoard();
+    this._pointsModel.addObserver(this.update);
+    this._filterModel.addObserver(this.update);
   }
 }
 

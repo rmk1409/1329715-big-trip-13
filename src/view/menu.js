@@ -29,8 +29,14 @@ class Menu extends AbstractView {
       this.getElement().querySelector(`.${ACTIVE_MENU_CLASS}`).classList.remove(ACTIVE_MENU_CLASS);
       element.classList.add(ACTIVE_MENU_CLASS);
 
-      this._cb.clickMenu(element);
+      this._cb.clickMenu(element.textContent);
     }
+  }
+
+  resetMenuItems() {
+    const menuItems = this.getElement().querySelectorAll(`a.trip-tabs__btn`);
+    menuItems.forEach((item)=>item.classList.remove(ACTIVE_MENU_CLASS));
+    menuItems[0].classList.add(ACTIVE_MENU_CLASS);
   }
 
   setMenuClickHandler(menuClickHandler) {

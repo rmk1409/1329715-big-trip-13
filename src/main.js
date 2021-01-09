@@ -4,7 +4,7 @@ import {Points as PointsModel} from "./model/points";
 import {Filter as FilterPresenter} from "./presenter/filter";
 import {Filter as FilterModel} from "./model/filter";
 import {Stats as StatsView} from "./view/stats";
-import {render, RenderPosition} from "./util/render";
+import {remove, render, RenderPosition} from "./util/render";
 import {Menu as MenuView} from "./view/menu";
 
 const ITEM_COUNT = 5;
@@ -27,28 +27,32 @@ tripPresenter.init();
 filterPresenter.init();
 
 const newPointButton = tripMain.querySelector(`.trip-main__event-add-btn`);
-newPointButton.addEventListener(`click`, tripPresenter.openNewPointForm);
-
-const statsView = new StatsView(points);
-render(pageBody, statsView, RenderPosition.BEFORE_END);
-
-const menuClickHandler = (menuElement) => {
-  const value = menuElement.textContent;
-  switch (value) {
-    case `Table`:
-      statsView.hide();
-      tripPresenter.show();
-      break;
-    case `Stats`:
-      tripPresenter.hide();
-      statsView.show();
-      break;
-    case `New event`:
-      break;
-  }
-};
+newPointButton.addEventListener(`click`, () => menuClickHandler(`New event`));
 
 const menuView = new MenuView();
 const menuHeader = tripMain.querySelector(`.trip-controls h2:first-child`);
 render(menuHeader, menuView, RenderPosition.AFTER_END);
+
+let statsView = null;
+const menuClickHandler = (value) => {
+  switch (value) {
+    case `Table`:
+      remove(statsView);
+      tripPresenter.show();
+      break;
+    case `Stats`:
+      tripPresenter.hide();
+      statsView = new StatsView(pointsModel.points);
+      render(pageBody, statsView, RenderPosition.BEFORE_END);
+      break;
+    case `New event`:
+      remove(statsView);
+      menuView.resetMenuItems();
+      tripPresenter.hide();
+      tripPresenter.show();
+      tripPresenter.openNewPointForm();
+      break;
+  }
+};
+
 menuView.setMenuClickHandler(menuClickHandler);
