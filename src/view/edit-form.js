@@ -169,9 +169,9 @@ class EditForm extends SmartView {
       // eslint-disable-next-line camelcase
       time_24hr: true,
       dateFormat: `d/m/y H:i`,
-      defaultDate: this._point.startDate.toDate(),
+      defaultDate: this._state.startDate.toDate(),
       onChange: this._changeStartDateHandler,
-      maxDate: this._point.endDate.add(-MIN_START_END_DATE_DIFFERENCE_IN_MINUTES, `minute`).toDate(),
+      maxDate: this._state.endDate.add(-MIN_START_END_DATE_DIFFERENCE_IN_MINUTES, `minute`).toDate(),
     };
 
     const endTimeSettings = {
@@ -179,9 +179,9 @@ class EditForm extends SmartView {
       // eslint-disable-next-line camelcase
       time_24hr: true,
       dateFormat: `d/m/y H:i`,
-      defaultDate: this._point.endDate.toDate(),
+      defaultDate: this._state.endDate.toDate(),
       onChange: this._changeEndDateHandler,
-      minDate: this._point.startDate.add(MIN_START_END_DATE_DIFFERENCE_IN_MINUTES, `minute`).toDate(),
+      minDate: this._state.startDate.add(MIN_START_END_DATE_DIFFERENCE_IN_MINUTES, `minute`).toDate(),
     };
 
     this._startDatePicker = flatpickr(this.getElement().querySelector(`.event__input--time[name=event-start-time]`), startTimeSettings);
@@ -192,14 +192,14 @@ class EditForm extends SmartView {
   _changeStartDateHandler([userDate]) {
     this.updateData({startDate: dayjs(userDate)}, false);
     if (this._endDatePicker) {
-      this._endDatePicker.set(`minDate`, this._point.startDate.add(MIN_START_END_DATE_DIFFERENCE_IN_MINUTES, `minute`).toDate());
+      this._endDatePicker.set(`minDate`, this._state.startDate.add(MIN_START_END_DATE_DIFFERENCE_IN_MINUTES, `minute`).toDate());
     }
   }
 
   _changeEndDateHandler([userDate]) {
     this.updateData({endDate: dayjs(userDate)}, false);
     if (this._startDatePicker) {
-      this._startDatePicker.set(`maxDate`, this._point.endDate.add(-MIN_START_END_DATE_DIFFERENCE_IN_MINUTES, `minute`).toDate());
+      this._startDatePicker.set(`maxDate`, this._state.endDate.add(-MIN_START_END_DATE_DIFFERENCE_IN_MINUTES, `minute`).toDate());
     }
   }
 
@@ -226,7 +226,7 @@ class EditForm extends SmartView {
     evt.preventDefault();
     const newDestination = evt.target.value;
     const pointInfo = destinationInfo.get(newDestination);
-    if ((this._point.destination !== newDestination) && pointInfo) {
+    if ((this._state.destination !== newDestination) && pointInfo) {
       this.updateData({info: pointInfo, destination: newDestination});
     }
     this._checkIsValidForm();
@@ -252,8 +252,8 @@ class EditForm extends SmartView {
 
     const name = evt.target.name;
     const isChecked = evt.target.checked;
-    const availableOffers = this._point.availableOffers;
-    const pointOffers = this._point.offers.slice();
+    const availableOffers = this._state.availableOffers;
+    const pointOffers = this._state.offers.slice();
 
     const offer = availableOffers.find((curOffer) => curOffer.name === name);
     if (isChecked) {
@@ -278,7 +278,7 @@ class EditForm extends SmartView {
 
   _submitHandler(evt) {
     evt.preventDefault();
-    this._cb.submit(this._point);
+    this._cb.submit(this._state);
   }
 
   setClickArrowHandler(cb) {
@@ -302,7 +302,7 @@ class EditForm extends SmartView {
   }
 
   getTemplate() {
-    return createEditFormTemplate(this._point, this._isNewForm);
+    return createEditFormTemplate(this._state, this._isNewForm);
   }
 
   restoreHandlers() {
@@ -316,6 +316,11 @@ class EditForm extends SmartView {
     this.setChangeDestinationHandler();
     this._setDatePickers();
     this.setChangePriceHandler();
+  }
+
+  updateData(changedData, needReload = true) {
+    super.updateData(changedData, needReload);
+    this._state.availableOffers = getAvailableOffers(this._state.type);
   }
 }
 

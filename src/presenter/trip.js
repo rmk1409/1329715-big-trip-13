@@ -1,4 +1,3 @@
-import Menu from '../view/menu';
 import TripEventsList from '../view/trip-events-list';
 import Sort from '../view/sort';
 import TripInfo from '../view/trip-info';
@@ -26,7 +25,6 @@ class Trip {
     this._tripInfoContainer = tripInfoContainer;
     this._pointsInfoContainer = pointsInfoContainer;
 
-    this._menuView = new Menu();
     this._sortView = null;
     this._pointListView = new TripEventsList();
     this._noPointsView = new ListEmpty();
@@ -62,16 +60,13 @@ class Trip {
 
     this.newPoint = new NewPoint(this._pointsListContainer, this._changePointsModelHandler, this._closeForm);
 
-    this._renderMenu();
     this._renderTripInfoAndCost();
 
     this._renderBoard();
   }
 
   openNewPointForm() {
-    if (this._currentSortMode !== SortMode.DEFAULT) {
-      this._sortChangeHandler(SortMode.DEFAULT);
-    }
+    this._sortChangeHandler(SortMode.DEFAULT);
     this._filterModel.activeFilter = FilterType.EVERYTHING;
 
     if (this._openedPointPresenter) {
@@ -88,11 +83,6 @@ class Trip {
       const newPointButton = this._tripInfoContainer.querySelector(`.trip-main__event-add-btn`);
       newPointButton.disabled = true;
     }
-  }
-
-  _renderMenu() {
-    const menuHeader = this._tripInfoContainer.querySelector(`.trip-controls h2:first-child`);
-    render(menuHeader, this._menuView, RenderPosition.AFTER_END);
   }
 
   _renderSort() {
@@ -246,6 +236,17 @@ class Trip {
       this._openedPointPresenter = null;
     }
     document.removeEventListener(`keydown`, this._onEscKeyDown);
+  }
+
+  hide() {
+    this._pointListView.hide();
+    this._sortView.hide();
+  }
+
+  show() {
+    this._pointListView.show();
+    this._sortChangeHandler(SortMode.DEFAULT);
+    this._sortView.show();
   }
 }
 
