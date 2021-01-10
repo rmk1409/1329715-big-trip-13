@@ -126,6 +126,7 @@ class Trip {
         this._renderBoard();
         break;
       case UpdateType.MAJOR:
+        this._closeForm();
         this._clearPointsBoard(true);
         this._renderBoard();
         this._renderTripInfoAndCost();
