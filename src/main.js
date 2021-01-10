@@ -6,6 +6,7 @@ import {Filter as FilterModel} from "./model/filter";
 import {Stats as StatsView} from "./view/stats";
 import {remove, render, RenderPosition} from "./util/render";
 import {Menu as MenuView} from "./view/menu";
+import {MenuItem} from "./util/const";
 
 const ITEM_COUNT = 5;
 const pageBody = document.querySelector(`.page-main .page-body__container`);
@@ -36,16 +37,16 @@ render(menuHeader, menuView, RenderPosition.AFTER_END);
 let statsView = null;
 const menuClickHandler = (value) => {
   switch (value) {
-    case `Table`:
+    case MenuItem.TABLE:
       remove(statsView);
       tripPresenter.show();
       break;
-    case `Stats`:
+    case MenuItem.STATS:
       tripPresenter.hide();
       statsView = new StatsView(pointsModel.points);
       render(pageBody, statsView, RenderPosition.BEFORE_END);
       break;
-    case `New event`:
+    case MenuItem.NEW_EVENT:
       remove(statsView);
       menuView.resetMenuItems();
       tripPresenter.hide();

@@ -3,6 +3,9 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 import {TYPES} from "../mock/point";
 import AbstractView from "./abstract-view";
 
+const BAR_HEIGHT = 55;
+const MIN_IN_DAY = 24 * 60;
+
 const createStatsTemplate = () => {
   return `<section class="statistics">
             <h2 class="visually-hidden">Trip statistics</h2>
@@ -20,8 +23,6 @@ const createStatsTemplate = () => {
             </div>
           </section>`;
 };
-
-const BAR_HEIGHT = 55;
 
 const getTypeMoneyMap = (points) => {
   const result = new Map();
@@ -62,8 +63,6 @@ const getTypeTimesMap = (points) => {
 
   return result;
 };
-
-const MIN_IN_DAY = 24 * 60;
 
 const getTypeDaysMap = (points) => {
   const result = new Map();

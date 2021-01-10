@@ -1,6 +1,6 @@
 import EditForm from '../view/edit-form';
 import TripEventsItem from '../view/trip-events-item';
-import {render, replace} from '../util/render';
+import {render, RenderPosition, replace} from '../util/render';
 import {ActionType, UpdateType} from "../util/const";
 
 class Point {
@@ -37,7 +37,7 @@ class Point {
     this._createComponents();
     this._setHandlersToComponents();
 
-    render(this._pointsListContainer, this._evtComponent, `beforeend`);
+    render(this._pointsListContainer, this._evtComponent, RenderPosition.BEFORE_END);
   }
 
   update(point) {
