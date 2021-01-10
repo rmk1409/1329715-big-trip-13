@@ -1,13 +1,13 @@
 import AbstractView from "./abstract-view";
-import {FilterFunctions, FilterType} from "../model/filter";
+import {FilterFunction, FilterType} from "../model/filter";
 
-const createFiltersTemplate = (points, currentChosenFilter) => {
-  const isFuturePresent = FilterFunctions.get(FilterType.FUTURE)(points).length;
-  const isPastPresent = FilterFunctions.get(FilterType.PAST)(points).length;
+const createFiltersTemplate = (points, activeFilter) => {
+  const isFuturePresent = FilterFunction.get(FilterType.FUTURE)(points).length;
+  const isPastPresent = FilterFunction.get(FilterType.PAST)(points).length;
 
-  const isEverythingChosen = currentChosenFilter === FilterType.EVERYTHING;
-  const isFutureChosen = currentChosenFilter === FilterType.FUTURE;
-  const isPastChosen = currentChosenFilter === FilterType.PAST;
+  const isEverythingChosen = activeFilter === FilterType.EVERYTHING;
+  const isFutureChosen = activeFilter === FilterType.FUTURE;
+  const isPastChosen = activeFilter === FilterType.PAST;
 
   return `<form class="trip-filters" action="#" method="get">
               <div class="trip-filters__filter">
@@ -30,14 +30,14 @@ const createFiltersTemplate = (points, currentChosenFilter) => {
 };
 
 class Filters extends AbstractView {
-  constructor(points, currentChosenFilter) {
+  constructor(points, activeFilter) {
     super();
     this._points = points;
-    this._currentChosenFilter = currentChosenFilter;
+    this._activeFilter = activeFilter;
   }
 
   getTemplate() {
-    return createFiltersTemplate(this._points, this._currentChosenFilter);
+    return createFiltersTemplate(this._points, this._activeFilter);
   }
 }
 

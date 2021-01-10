@@ -16,4 +16,10 @@ const UpdateType = {
   MAJOR: `Major`,
 };
 
-export {ActionType, UpdateType};
+const MenuItem = {
+  TABLE: `Table`,
+  STATS: `Stats`,
+  NEW_EVENT: `New event`
+};
+
+export {ActionType, UpdateType, MenuItem};

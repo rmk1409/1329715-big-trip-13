@@ -1,6 +1,7 @@
 import Offer from "./offer";
 import {getDateDifference} from "../util/point";
 import SmartView from './smart-view';
+import {getAvailableOffers} from "../mock/offer";
 
 const createTripEventsItemTemplate = (point) => {
   const {startDate, type, destination, endDate, price, offers, isFavorite} = point;
@@ -78,6 +79,11 @@ class TripEventsItem extends SmartView {
   restoreHandlers() {
     this.getElement().querySelector(`.event__favorite-btn`).addEventListener(`click`, this._clickFavoriteHandler);
     this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._clickArrowHandler);
+  }
+
+  updateData(changedData, needReload = true) {
+    super.updateData(changedData, needReload);
+    this._state.availableOffers = getAvailableOffers(this._state.type);
   }
 }
 

@@ -25,6 +25,14 @@ class AbstractView {
   removeElement() {
     this._element = null;
   }
+
+  show() {
+    this.getElement().classList.remove(`hide-element`);
+  }
+
+  hide() {
+    this.getElement().classList.add(`hide-element`);
+  }
 }
 
 export default AbstractView;
