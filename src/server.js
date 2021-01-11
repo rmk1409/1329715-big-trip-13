@@ -13,6 +13,16 @@ class Server {
     return this._sendRequest({url: `${requestedData}`});
   }
 
+  updatePoint(updatedPoint) {
+    return this._sendRequest({
+      url: `points/${updatedPoint.id}`,
+      method: Method.PUT,
+      body: JSON.stringify(updatedPoint),
+      // TODO try to update without content-type header.
+      headers: new Headers({"Content-Type": `application/json`}),
+    });
+  }
+
   _checkStatus(resp) {
     if (!resp.ok) {
       throw new Error(`${resp.status}: ${resp.statusText}`);

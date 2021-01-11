@@ -67,12 +67,12 @@ const authorizationKey = `Basic z{NDj5DNr+].tL3g`;
 const server = new Server(endPoint, authorizationKey);
 
 const offersModel = new OffersModel();
-server.getData(`offers`).then((data) => {
+const offersPromise = server.getData(`offers`).then((data) => {
   offersModel.offers = data;
 });
 
 const destinationModel = new DestinationModel();
-server.getData(`destinations`).then((data) => {
+const destinationPromise = server.getData(`destinations`).then((data) => {
   destinationModel.destinations = data;
 });
 
