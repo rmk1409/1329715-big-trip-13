@@ -7,6 +7,9 @@ import {Stats as StatsView} from "./view/stats";
 import {remove, render, RenderPosition} from "./util/render";
 import {Menu as MenuView} from "./view/menu";
 import {MenuItem} from "./util/const";
+import {Server} from "./server";
+import {Offers as OffersModel} from "./model/offers";
+import {Destination as DestinationModel} from "./model/destination";
 
 const ITEM_COUNT = 5;
 const pageBody = document.querySelector(`.page-main .page-body__container`);
@@ -57,3 +60,21 @@ const menuClickHandler = (value) => {
 };
 
 menuView.setMenuClickHandler(menuClickHandler);
+
+const endPoint = `https://13.ecmascript.pages.academy/big-trip/`;
+const authorizationKey = `Basic z{NDj5DNr+].tL3g`;
+
+const server = new Server(endPoint, authorizationKey);
+
+const offersModel = new OffersModel();
+server.getData(`offers`).then((data) => {
+  offersModel.offers = data;
+});
+
+const destinationModel = new DestinationModel();
+server.getData(`destinations`).then((data) => {
+  destinationModel.destinations = data;
+});
+
+server.getData(`points`).then((data) => console.log(data));
+
