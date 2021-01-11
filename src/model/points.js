@@ -30,6 +30,30 @@ class Points extends Observable {
 
     super.notifyAllObservers(UpdateType.MAJOR);
   }
+
+  static adaptToClient(point) {
+    // check - destination {name, description, pictures[{src, description}]}
+    // check - offers [{title, price}]
+    const adaptedPoint = Object.assign(
+      {},
+      point,
+      {
+        isFavorite: point.is_favorite,
+        startDate: new Date(point.date_from),
+        endDate: new Date(point.date_to),
+        price: point.base_price,
+
+      }
+    );
+
+    return adaptedPoint;
+  }
+
+  static adaptToServer(point) {
+    const adaptedPoint = null;
+
+    return adaptedPoint;
+  }
 }
 
 export {Points};
