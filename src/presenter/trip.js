@@ -166,7 +166,9 @@ class Trip {
   _changePointsModelHandler(updatedPoint, actionType, updateType) {
     switch (actionType) {
       case ActionType.ADD:
-        this._pointsModel.addPoint(updatedPoint);
+        this._server.addPoint(updatedPoint).then((response)=>{
+          this._pointsModel.addPoint(PointsModel.adaptToClient(response));
+        });
         break;
       case ActionType.UPDATE:
         this._server.updatePoint(updatedPoint).then((response) => {
@@ -174,7 +176,11 @@ class Trip {
         });
         break;
       case ActionType.DELETE:
-        this._pointsModel.deletePoint(updatedPoint);
+        debugger
+        this._server.deletePoint(updatedPoint.id).then(() => {
+          debugger
+          this._pointsModel.deletePoint(updatedPoint);
+        });
         break;
     }
   }
