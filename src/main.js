@@ -42,7 +42,7 @@ const menuClickHandler = (value) => {
       break;
     case MenuItem.STATS:
       tripPresenter.hide();
-      statsView = new StatsView(pointsModel.points);
+      statsView = new StatsView(pointsModel.points, offersModel);
       render(pageBody, statsView, RenderPosition.BEFORE_END);
       break;
     case MenuItem.NEW_EVENT:
