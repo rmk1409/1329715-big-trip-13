@@ -14,7 +14,7 @@ class Server {
   }
 
   getData(requestedData) {
-    let promise = this._sendRequest({url: `${requestedData}`});
+    let promise = this._sendRequest({url: `${requestedData}`}).then(this._toJSON);
     switch (requestedData) {
       case `points`:
         promise = promise.then((points) => points.map(PointsModel.adaptToClient));
@@ -29,7 +29,7 @@ class Server {
       method: Method.PUT,
       body: JSON.stringify(PointsModel.adaptToServer(updatedPoint)),
       headers: new Headers({"Content-Type": `application/json`}),
-    });
+    }).then(this._toJSON);
   }
 
   addPoint(newPoint) {
@@ -39,15 +39,18 @@ class Server {
       method: Method.POST,
       body: JSON.stringify(toServer),
       headers: new Headers({"Content-Type": `application/json`}),
-    });
+    }).then(this._toJSON);
   }
 
   deletePoint(id) {
-    debugger
     return this._sendRequest({
       url: `points/${id}`,
-      method: Method.DELETE
+      method: Method.DELETE,
     });
+  }
+
+  _toJSON(resp) {
+    return resp.json();
   }
 
   _checkStatus(resp) {
@@ -63,14 +66,13 @@ class Server {
   }
 
   _sendRequest(requestData) {
-    const {url = ``, method = Method.GET, body = ``, headers = new Headers()} = requestData;
+    const {url = ``, method = Method.GET, body = null, headers = new Headers()} = requestData;
     headers.append(`Authorization`, this._authorizationKey);
 
     const fullUrl = `${this._endPoint}/${url}`;
 
     return fetch(fullUrl, {method, body, headers})
-      .then(this._checkStatus)
-      .then((resp) => resp.json());
+      .then(this._checkStatus);
   }
 }
 

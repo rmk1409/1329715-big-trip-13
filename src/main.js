@@ -11,7 +11,7 @@ import {Offers as OffersModel} from "./model/offers";
 import {Destination as DestinationModel} from "./model/destination";
 
 const END_POINT = `https://13.ecmascript.pages.academy/big-trip/`;
-const AUTHORIZATION_KEY = `Basic z{NDj5DNr+].tL321`;
+const AUTHORIZATION_KEY = `Basic tRCyBa6sgC)zar>`;
 
 const pageBody = document.querySelector(`.page-main .page-body__container`);
 const tripMain = document.querySelector(`.trip-main`);
