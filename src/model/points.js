@@ -1,5 +1,6 @@
 import Observable from "../util/pattern/observer/observable";
 import {UpdateType} from "../util/const";
+import * as dayjs from "dayjs";
 
 class Points extends Observable {
   constructor(points) {
@@ -32,19 +33,20 @@ class Points extends Observable {
   }
 
   static adaptToClient(point) {
-    // TODO IN PROGRESS - check - destination {name, description, pictures[{src, description}]}
+    const {
+      is_favorite: isFavorite,
+      base_price: price,
+      startDate = dayjs(point.date_from),
+      endDate = dayjs(point.date_to),
+      info = {description: point.destination.name, photos: point.destination.pictures},
+    } = point;
+    const destination = point.destination.name;
+    const adaptedPoint = Object.assign({}, point, {isFavorite, startDate, endDate, price, destination, info});
 
-    const adaptedPoint = Object.assign(
-      {},
-      point,
-      {
-        isFavorite: point.is_favorite,
-        startDate: new Date(point.date_from),
-        endDate: new Date(point.date_to),
-        price: point.base_price,
-
-      }
-    );
+    delete adaptedPoint.is_favorite;
+    delete adaptedPoint.date_from;
+    delete adaptedPoint.date_to;
+    delete adaptedPoint.base_price;
 
     return adaptedPoint;
   }

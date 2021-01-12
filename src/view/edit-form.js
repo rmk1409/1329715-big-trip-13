@@ -40,7 +40,7 @@ const getDestination = (point) => {
 
               <div class="event__photos-container">
                 <div class="event__photos-tape">
-                    ${photos.length > 0 ? photos.map((src) => `<img class="event__photo" src="${src}" alt="Event photo">`).join(``) : ``}
+                    ${photos.length > 0 ? photos.map(({src, photoDescription}) => `<img class="event__photo" src="${src}" alt="${photoDescription}">`).join(``) : ``}
                 </div>
               </div>
             </section>`;

@@ -7,6 +7,10 @@ class Destination {
     }));
   }
 
+  get destinations() {
+    return this._destinationInfo;
+  }
+
   getDestinationInfo(destination) {
     return this._destinationInfo.get(destination) || [];
   }

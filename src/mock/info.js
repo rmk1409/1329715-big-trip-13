@@ -33,7 +33,10 @@ const getPhoto = () => {
   const photos = [];
   const photoCount = Math.ceil(Math.random() * MAX_PHOTO_COUNT);
   for (let i = 0; i < photoCount; i++) {
-    photos.push(`http://picsum.photos/248/152?r=${Math.random()}`);
+    const randomNumber = Math.random();
+    const src = `http://picsum.photos/248/152?r=${randomNumber}`;
+    const description = `photo - description ${randomNumber}`;
+    photos.push({src, description});
   }
   return photos;
 };

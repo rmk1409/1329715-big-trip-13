@@ -1,3 +1,5 @@
+import {Points as PointsModel} from "./model/points";
+
 const Method = {
   GET: `GET`,
   PUT: `PUT`,
@@ -10,13 +12,20 @@ class Server {
   }
 
   getData(requestedData) {
-    return this._sendRequest({url: `${requestedData}`});
+    let promise = this._sendRequest({url: `${requestedData}`});
+    switch (requestedData) {
+      case `points`:
+        promise = promise.then((points) => points.map(PointsModel.adaptToClient));
+        break;
+    }
+    return promise;
   }
 
   updatePoint(updatedPoint) {
     return this._sendRequest({
       url: `points/${updatedPoint.id}`,
       method: Method.PUT,
+      // TODO Add adapt to Server
       body: JSON.stringify(updatedPoint),
       // TODO try to update without content-type header.
       headers: new Headers({"Content-Type": `application/json`}),
