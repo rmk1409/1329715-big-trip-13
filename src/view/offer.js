@@ -1,9 +1,9 @@
 import AbstractView from "./abstract-view";
 
 const createOfferTemplate = (offer) => {
-  const {name, price} = offer;
+  const {title, price} = offer;
   return `<li class="event__offer">
-            <span class="event__offer-title">${name}</span>
+            <span class="event__offer-title">${title}</span>
             &plus;&euro;&nbsp;
             <span class="event__offer-price">${price}</span>
           </li>`;

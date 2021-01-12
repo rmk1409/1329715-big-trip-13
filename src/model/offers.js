@@ -4,7 +4,11 @@ class Offers {
     offers.forEach((offerTypeObject) => this._typeOffer.set(offerTypeObject.type, offerTypeObject.offers));
   }
 
-  getOffersForPointType(pointType) {
+  get offers() {
+    return this._typeOffer;
+  }
+
+  getAvailableOffers(pointType) {
     return this._typeOffer.get(pointType) || [];
   }
 }

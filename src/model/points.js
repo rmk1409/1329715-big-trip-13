@@ -32,8 +32,8 @@ class Points extends Observable {
   }
 
   static adaptToClient(point) {
-    // check - destination {name, description, pictures[{src, description}]}
-    // check - offers [{title, price}]
+    // TODO IN PROGRESS - check - destination {name, description, pictures[{src, description}]}
+
     const adaptedPoint = Object.assign(
       {},
       point,

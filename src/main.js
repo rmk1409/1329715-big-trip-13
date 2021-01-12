@@ -69,12 +69,13 @@ const server = new Server(endPoint, authorizationKey);
 const offersModel = new OffersModel();
 const offersPromise = server.getData(`offers`).then((data) => {
   offersModel.offers = data;
-});
+}).then(()=>console.log(offersModel.offers));
 
 const destinationModel = new DestinationModel();
 const destinationPromise = server.getData(`destinations`).then((data) => {
   destinationModel.destinations = data;
 });
 
+console.log(pointsModel.points);
 server.getData(`points`).then((data) => console.log(data));
 

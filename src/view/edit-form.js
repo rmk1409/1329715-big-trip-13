@@ -250,12 +250,12 @@ class EditForm extends SmartView {
   _offerChooseHandler(evt) {
     evt.preventDefault();
 
-    const name = evt.target.name;
+    const title = evt.target.name;
     const isChecked = evt.target.checked;
     const availableOffers = this._state.availableOffers;
     const pointOffers = this._state.offers.slice();
 
-    const offer = availableOffers.find((curOffer) => curOffer.name === name);
+    const offer = availableOffers.find((curOffer) => curOffer.title === title);
     if (isChecked) {
       pointOffers.push(offer);
     } else {
