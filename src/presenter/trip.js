@@ -22,7 +22,7 @@ sortMap.set(SortMode.TIME, (a, b) => a.endDate.diff(a.startDate) - b.endDate.dif
 sortMap.set(SortMode.PRICE, (a, b) => a.price - b.price);
 
 class Trip {
-  constructor(tripInfoContainer, pointsInfoContainer, pointsModel, filterModel, offerModel) {
+  constructor(tripInfoContainer, pointsInfoContainer, pointsModel, filterModel, offerModel, destinationModel) {
     this._tripInfoContainer = tripInfoContainer;
     this._pointsInfoContainer = pointsInfoContainer;
 
@@ -57,6 +57,7 @@ class Trip {
     this._isLoading = true;
     this._loadingComponent = new LoadingView();
     this._offerModel = offerModel;
+    this._destinationModel = destinationModel;
   }
 
   _renderLoading() {
@@ -67,7 +68,7 @@ class Trip {
     this._renderTripEventsList();
     this._pointsListContainer = this._pointsInfoContainer.querySelector(`.trip-events__list`);
 
-    this.newPoint = new NewPoint(this._pointsListContainer, this._changePointsModelHandler, this._closeForm);
+    this.newPoint = new NewPoint(this._pointsListContainer, this._changePointsModelHandler, this._closeForm, this._offerModel, this._destinationModel);
 
     if (!this._isLoading) {
       this._renderTripInfoAndCost();
@@ -201,7 +202,7 @@ class Trip {
   }
 
   _renderPoint(point) {
-    const presenter = new PointPresenter(this._pointsListContainer, this._openedPointPresenterSetter, this._changePointsModelHandler, this._offerModel);
+    const presenter = new PointPresenter(this._pointsListContainer, this._openedPointPresenterSetter, this._changePointsModelHandler, this._offerModel, this._destinationModel);
     presenter.init(point);
     this._pointPresenters.set(point.id, presenter);
   }

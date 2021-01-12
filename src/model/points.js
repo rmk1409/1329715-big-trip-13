@@ -44,7 +44,7 @@ class Points extends Observable {
       base_price: price,
       startDate = dayjs(point.date_from),
       endDate = dayjs(point.date_to),
-      info = {description: point.destination.description, photos: point.destination.pictures},
+      info = {description: point.destination.description, pictures: point.destination.pictures},
     } = point;
     const destination = point.destination.name;
     const adaptedPoint = Object.assign({}, point, {isFavorite, startDate, endDate, price, destination, info});
@@ -57,11 +57,11 @@ class Points extends Observable {
     return adaptedPoint;
   }
 
-  static adaptToServer(point) {
-    const adaptedPoint = null;
-
-    return adaptedPoint;
-  }
+  // static adaptToServer(point) {
+  //   const adaptedPoint = null;
+  //
+  //   return adaptedPoint;
+  // }
 }
 
 export {Points};

@@ -1,31 +1,34 @@
 import EditForm from "../view/edit-form";
 import {ActionType, UpdateType} from "../util/const";
-import {TYPES} from "../mock/point";
 import dayjs from "dayjs";
 import {render, RenderPosition} from "../util/render";
 
 const MIN_POINT_DURATION_IN_MIN = 5;
 
-const EMPTY_POINT = {
-  info: {},
-  type: TYPES[0],
-  offers: [],
-  startDate: dayjs(),
-  endDate: dayjs().add(MIN_POINT_DURATION_IN_MIN, `minute`),
-};
-
 export default class NewPoint {
-  constructor(pointsListContainer, changePointsModelHandler, cancelClickHandler, offerModel) {
+  constructor(pointsListContainer, changePointsModelHandler, cancelClickHandler, offerModel, destinationModel) {
     this._pointsListContainer = pointsListContainer;
     this._changePointsModelHander = changePointsModelHandler;
     this._cancelClickHandler = cancelClickHandler;
 
     this._submitHandler = this._submitHandler.bind(this);
     this._offerModel = offerModel;
+    this._destinationModel = destinationModel;
+  }
+
+  _getEmptyPoint() {
+    const firstType = Array.from(this._offerModel.offers.keys())[0];
+    return {
+      info: {},
+      type: firstType,
+      offers: [],
+      startDate: dayjs(),
+      endDate: dayjs().add(MIN_POINT_DURATION_IN_MIN, `minute`),
+    };
   }
 
   init() {
-    this._editFormComponent = new EditForm(EMPTY_POINT, this._offerModel, true);
+    this._editFormComponent = new EditForm(this._getEmptyPoint(), this._offerModel, this._destinationModel, true);
     this._setHandlers();
 
     render(this._pointsListContainer, this._editFormComponent, RenderPosition.AFTER_BEGIN);

@@ -1,10 +1,9 @@
 import AbstractView from "./abstract-view";
-import {getAvailableOffers} from "../mock/offer";
-import {Offers} from "../model/offers";
 
 const getEditOffers = (point, offerModel) => {
   const {id, offers: pointOffers} = point;
-  return offerModel.getAvailableOffers(point.type).map((curAvailableOffer) => {
+  const availableOffers = offerModel.getAvailableOffers(point.type);
+  return availableOffers.map((curAvailableOffer) => {
     const {title, price} = curAvailableOffer;
     const isChecked = pointOffers.findIndex((offer) => curAvailableOffer.title === offer.title) >= 0;
     return `<div class="event__offer-selector">

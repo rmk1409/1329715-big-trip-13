@@ -4,7 +4,7 @@ import {render, RenderPosition, replace} from '../util/render';
 import {ActionType, UpdateType} from "../util/const";
 
 class Point {
-  constructor(pointsListContainer, openedPointPresenterSetter, changePointsModelHandler, offerModel) {
+  constructor(pointsListContainer, openedPointPresenterSetter, changePointsModelHandler, offerModel, destinationModel) {
     this._pointsListContainer = pointsListContainer;
     this._point = null;
 
@@ -18,11 +18,12 @@ class Point {
     this._changePointsModelHander = changePointsModelHandler;
 
     this._offerModel = offerModel;
+    this._destinationModel = destinationModel;
   }
 
   _createComponents() {
     this._evtComponent = new TripEventsItem(this._point);
-    this._editFormComponent = new EditForm(this._point, this._offerModel);
+    this._editFormComponent = new EditForm(this._point, this._offerModel, this._destinationModel);
   }
 
   _setHandlersToComponents() {
