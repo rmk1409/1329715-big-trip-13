@@ -40,11 +40,17 @@ export default class NewPoint {
   }
 
   _submitHandler(point) {
-    this.closeForm();
     this._changePointsModelHander(point, ActionType.ADD, UpdateType.MAJOR);
+    // this.closeForm();
   }
 
   closeForm() {
     this._editFormComponent.getElement().remove();
+  }
+
+  setSaving() {
+    this._editFormComponent.updateData({
+      isSaving: true
+    });
   }
 }

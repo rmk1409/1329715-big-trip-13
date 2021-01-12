@@ -1,7 +1,7 @@
 import EditForm from '../view/edit-form';
 import TripEventsItem from '../view/trip-events-item';
 import {render, RenderPosition, replace} from '../util/render';
-import {ActionType, UpdateType} from "../util/const";
+import {ActionType, State, UpdateType} from "../util/const";
 
 class Point {
   constructor(pointsListContainer, openedPointPresenterSetter, changePointsModelHandler, offerModel, destinationModel) {
@@ -79,7 +79,7 @@ class Point {
   }
 
   _submitHandler(point) {
-    this.toggleFormToPoint();
+    // this.toggleFormToPoint();
     this._changePointsModelHander(point, ActionType.UPDATE, this._getUpdateType(point));
   }
 
@@ -100,6 +100,21 @@ class Point {
   toggleFormToPoint() {
     this._openedPointPresenterSetter(null);
     replace(this._evtComponent, this._editFormComponent);
+  }
+
+  setViewState(state) {
+    switch (state) {
+      case State.SAVING:
+        this._editFormComponent.updateData({
+          isSaving: true,
+        });
+        break;
+      case State.DELETING:
+        this._editFormComponent.updateData({
+          isDeleting: true,
+        });
+        break;
+    }
   }
 }
 

@@ -5,7 +5,7 @@ import TripCost from '../view/trip-cost';
 import {remove, render, RenderPosition} from '../util/render';
 import ListEmpty from '../view/list-empty';
 import {Point as PointPresenter} from './point';
-import {ActionType, UpdateType} from "../util/const";
+import {ActionType, State, UpdateType} from "../util/const";
 import NewPoint from "./newPoint";
 import {FilterFunction, FilterType} from "../model/filter";
 import {Loading as LoadingView} from "../view/loading";
@@ -166,16 +166,19 @@ class Trip {
   _changePointsModelHandler(updatedPoint, actionType, updateType) {
     switch (actionType) {
       case ActionType.ADD:
+        this.newPoint.setSaving();
         this._server.addPoint(updatedPoint).then((response) => {
           this._pointsModel.addPoint(PointsModel.adaptToClient(response));
         });
         break;
       case ActionType.UPDATE:
+        this._pointPresenters.get(updatedPoint.id).setViewState(State.SAVING);
         this._server.updatePoint(updatedPoint).then((response) => {
           this._pointsModel.updatePoint(updateType, PointsModel.adaptToClient(response));
         });
         break;
       case ActionType.DELETE:
+        this._pointPresenters.get(updatedPoint.id).setViewState(State.DELETING);
         this._server.deletePoint(updatedPoint.id).then(() => {
           this._pointsModel.deletePoint(updatedPoint);
         });
