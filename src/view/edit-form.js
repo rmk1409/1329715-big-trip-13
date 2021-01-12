@@ -7,10 +7,11 @@ import {destinationInfo} from '../mock/info';
 import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 import flatpickr from 'flatpickr';
 import dayjs from 'dayjs';
+import {Offers} from "../model/offers";
 
 const MIN_START_END_DATE_DIFFERENCE_IN_MINUTES = 5;
 
-const createDestinationlist = () => {
+const createDestinationList = () => {
   return CITIES.slice()
     .map((city) => `<option value="${city}"></option>`).join(``);
 };
@@ -40,7 +41,10 @@ const getDestination = (point) => {
 
               <div class="event__photos-container">
                 <div class="event__photos-tape">
-                    ${photos.length > 0 ? photos.map(({src, photoDescription}) => `<img class="event__photo" src="${src}" alt="${photoDescription}">`).join(``) : ``}
+                    ${photos.length > 0 ? photos.map(({
+      src,
+      photoDescription,
+    }) => `<img class="event__photo" src="${src}" alt="${photoDescription}">`).join(``) : ``}
                 </div>
               </div>
             </section>`;
@@ -55,7 +59,7 @@ const getRollupButton = (isNew) => {
                         </button>`;
 };
 
-const createEditFormTemplate = (point, isNewForm) => {
+const createEditFormTemplate = (point, offerModel, isNewForm) => {
   const {
     id = ``,
     type = TYPES[0],
@@ -91,7 +95,7 @@ const createEditFormTemplate = (point, isNewForm) => {
                     </label>
                     <input class="event__input  event__input--destination" id="event-destination-${id}" type="text" name="event-destination" value="${destination}" list="destination-list-${id}" required>
                     <datalist id="destination-list-${id}">
-                        ${createDestinationlist()}
+                        ${createDestinationList()}
                     </datalist>
                   </div>
 
@@ -117,9 +121,9 @@ const createEditFormTemplate = (point, isNewForm) => {
                 </header>
                 <section class="event__details">
                   <section class="event__section  event__section--offers">
-                    ${getAvailableOffers(type).length > 0 ? ` <h3 class="event__section-title  event__section-title--offers">Offers</h3>
+                    ${offerModel.getAvailableOffers(type).length > 0 ? ` <h3 class="event__section-title  event__section-title--offers">Offers</h3>
                      <div class="event__available-offers">
-                            ${new EditOffers(point).getTemplate()}
+                            ${new EditOffers(point, offerModel).getTemplate()}
                     </div>` : ``}
                   </section>
 
@@ -130,8 +134,9 @@ const createEditFormTemplate = (point, isNewForm) => {
 };
 
 class EditForm extends SmartView {
-  constructor(point, isNewForm = false) {
+  constructor(point, offerModel, isNewForm = false) {
     super(point);
+    this._offerModel = offerModel;
     this._isNewForm = isNewForm;
     this._startDatePicker = null;
     this._endDatePicker = null;
@@ -302,7 +307,7 @@ class EditForm extends SmartView {
   }
 
   getTemplate() {
-    return createEditFormTemplate(this._state, this._isNewForm);
+    return createEditFormTemplate(this._state, this._offerModel, this._isNewForm);
   }
 
   restoreHandlers() {

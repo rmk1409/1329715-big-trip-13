@@ -8,6 +8,7 @@ import {Point as PointPresenter} from './point';
 import {ActionType, UpdateType} from "../util/const";
 import NewPoint from "./newPoint";
 import {FilterFunction, FilterType} from "../model/filter";
+import {Loading as LoadingView} from "../view/loading";
 
 const SortMode = {
   DEFAULT: `sort-day`,
@@ -21,7 +22,7 @@ sortMap.set(SortMode.TIME, (a, b) => a.endDate.diff(a.startDate) - b.endDate.dif
 sortMap.set(SortMode.PRICE, (a, b) => a.price - b.price);
 
 class Trip {
-  constructor(tripInfoContainer, pointsInfoContainer, pointsModel, filterModel) {
+  constructor(tripInfoContainer, pointsInfoContainer, pointsModel, filterModel, offerModel) {
     this._tripInfoContainer = tripInfoContainer;
     this._pointsInfoContainer = pointsInfoContainer;
 
@@ -52,6 +53,14 @@ class Trip {
     this._filterModel = filterModel;
     this._pointsModel.addObserver(this.update);
     this._filterModel.addObserver(this.update);
+
+    this._isLoading = true;
+    this._loadingComponent = new LoadingView();
+    this._offerModel = offerModel;
+  }
+
+  _renderLoading() {
+    render(this._pointsInfoContainer, this._loadingComponent, RenderPosition.BEFORE_END);
   }
 
   init() {
@@ -60,7 +69,9 @@ class Trip {
 
     this.newPoint = new NewPoint(this._pointsListContainer, this._changePointsModelHandler, this._closeForm);
 
-    this._renderTripInfoAndCost();
+    if (!this._isLoading) {
+      this._renderTripInfoAndCost();
+    }
 
     this._renderBoard();
   }
@@ -131,12 +142,22 @@ class Trip {
         this._renderBoard();
         this._renderTripInfoAndCost();
         break;
+      case UpdateType.INIT:
+        this._isLoading = false;
+        remove(this._loadingComponent);
+        this._renderBoard();
+        this._renderTripInfoAndCost();
+        break;
     }
   }
 
   _renderBoard() {
-    this._renderPoints(this._getPoints());
-    this._renderSort();
+    if (this._isLoading) {
+      this._renderLoading();
+    } else {
+      this._renderPoints(this._getPoints());
+      this._renderSort();
+    }
   }
 
   _changePointsModelHandler(updatedPoint, actionType, updateType) {
@@ -180,7 +201,7 @@ class Trip {
   }
 
   _renderPoint(point) {
-    const presenter = new PointPresenter(this._pointsListContainer, this._openedPointPresenterSetter, this._changePointsModelHandler);
+    const presenter = new PointPresenter(this._pointsListContainer, this._openedPointPresenterSetter, this._changePointsModelHandler, this._offerModel);
     presenter.init(point);
     this._pointPresenters.set(point.id, presenter);
   }

@@ -3,13 +3,19 @@ import {UpdateType} from "../util/const";
 import * as dayjs from "dayjs";
 
 class Points extends Observable {
-  constructor(points) {
+  constructor() {
     super();
-    this._points = points;
+    this._points = [];
   }
 
   get points() {
     return this._points;
+  }
+
+  set points(points) {
+    this._points = points;
+
+    this.notifyAllObservers(UpdateType.INIT);
   }
 
   addPoint(newPoint) {
@@ -38,7 +44,7 @@ class Points extends Observable {
       base_price: price,
       startDate = dayjs(point.date_from),
       endDate = dayjs(point.date_to),
-      info = {description: point.destination.name, photos: point.destination.pictures},
+      info = {description: point.destination.description, photos: point.destination.pictures},
     } = point;
     const destination = point.destination.name;
     const adaptedPoint = Object.assign({}, point, {isFavorite, startDate, endDate, price, destination, info});

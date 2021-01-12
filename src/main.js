@@ -17,15 +17,19 @@ const tripMain = document.querySelector(`.trip-main`);
 const tripEvents = pageBody.querySelector(`.trip-events`);
 const filterHeader = tripMain.querySelector(`.trip-controls h2:nth-of-type(2)`);
 
-const points = [];
-for (let i = 0; i < ITEM_COUNT; i++) {
-  points.push(generatePoint());
-}
+// const points = [];
+// for (let i = 0; i < ITEM_COUNT; i++) {
+//   points.push(generatePoint());
+// }
 
-const pointsModel = new PointsModel(points);
+// const pointsModel = new PointsModel(points);
+const pointsModel = new PointsModel();
 const filterModel = new FilterModel();
 
-const tripPresenter = new TripPresenter(tripMain, tripEvents, pointsModel, filterModel);
+const offersModel = new OffersModel();
+const destinationModel = new DestinationModel();
+
+const tripPresenter = new TripPresenter(tripMain, tripEvents, pointsModel, filterModel, offersModel);
 const filterPresenter = new FilterPresenter(filterHeader, pointsModel, filterModel);
 tripPresenter.init();
 filterPresenter.init();
@@ -66,16 +70,13 @@ const authorizationKey = `Basic z{NDj5DNr+].tL3g`;
 
 const server = new Server(endPoint, authorizationKey);
 
-const offersModel = new OffersModel();
-const offersPromise = server.getData(`offers`).then((data) => {
-  offersModel.offers = data;
-});
+const offersPromise = server.getData(`offers`);
+const destinationPromise = server.getData(`destinations`);
 
-const destinationModel = new DestinationModel();
-const destinationPromise = server.getData(`destinations`).then((data) => {
-  destinationModel.destinations = data;
-});
-
-console.log(pointsModel.points);
-server.getData(`points`).then((data) => console.log(data));
-
+const pointsPromise = server.getData(`points`);
+Promise.all([offersPromise, destinationPromise, pointsPromise])
+  .then(([offersData, destinationData, pointsData]) => {
+    offersModel.offers = offersData;
+    destinationModel.destinations = destinationData;
+    pointsModel.points = pointsData;
+  });
