@@ -94,7 +94,7 @@ class Point {
   }
 
   resetIntermediateState() {
-    this._editFormComponent.updateData(this._point, false);
+    this._editFormComponent.updateData(this._point, true);
   }
 
   toggleFormToPoint() {

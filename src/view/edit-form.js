@@ -294,14 +294,14 @@ class EditForm extends SmartView {
     this._cb.submit(this._state);
   }
 
-  setClickArrowHandler(cb) {
-    this._cb.clickArrow = cb;
-    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._clickArrowHandler);
-  }
-
   _clickArrowHandler(evt) {
     evt.preventDefault();
     this._cb.clickArrow();
+  }
+
+  setClickArrowHandler(cb) {
+    this._cb.clickArrow = cb;
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._clickArrowHandler);
   }
 
   setDeleteButtonHandler(cb) {
