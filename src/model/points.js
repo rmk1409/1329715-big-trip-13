@@ -1,14 +1,22 @@
+/* eslint-disable camelcase */
 import Observable from "../util/pattern/observer/observable";
 import {UpdateType} from "../util/const";
+import * as dayjs from "dayjs";
 
 class Points extends Observable {
-  constructor(points) {
+  constructor() {
     super();
-    this._points = points;
+    this._points = [];
   }
 
   get points() {
     return this._points;
+  }
+
+  set points(points) {
+    this._points = points;
+
+    this.notifyAllObservers(UpdateType.INIT);
   }
 
   addPoint(newPoint) {
@@ -29,6 +37,48 @@ class Points extends Observable {
     this._points.splice(index, 1);
 
     super.notifyAllObservers(UpdateType.MAJOR);
+  }
+
+  static adaptToClient(point) {
+    const {
+      is_favorite: isFavorite,
+      base_price: price,
+      startDate = dayjs(point.date_from),
+      endDate = dayjs(point.date_to),
+      info = {description: point.destination.description, pictures: point.destination.pictures},
+    } = point;
+    const destination = point.destination.name;
+    const adaptedPoint = Object.assign({}, point, {isFavorite, startDate, endDate, price, destination, info});
+
+    delete adaptedPoint.is_favorite;
+    delete adaptedPoint.date_from;
+    delete adaptedPoint.date_to;
+    delete adaptedPoint.base_price;
+
+    return adaptedPoint;
+  }
+
+  static adaptToServer(point) {
+    const {
+      isFavorite: is_favorite,
+      price: base_price,
+      date_from = new Date(point.startDate),
+      date_to = new Date(point.endDate),
+    } = point;
+
+    const adaptedPoint = Object.assign({}, point, {is_favorite, base_price, date_from, date_to});
+    adaptedPoint.destination = {
+      name: point.destination,
+      description: point.info.description,
+      pictures: point.info.pictures,
+    };
+
+    delete adaptedPoint.isFavorite;
+    delete adaptedPoint.price;
+    delete adaptedPoint.startDate;
+    delete adaptedPoint.endDate;
+
+    return adaptedPoint;
   }
 }
 

@@ -14,6 +14,7 @@ const UpdateType = {
   PATCH: `Patch`,
   MINOR: `Minor`,
   MAJOR: `Major`,
+  INIT: `Init`
 };
 
 const MenuItem = {

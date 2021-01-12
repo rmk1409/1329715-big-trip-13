@@ -1,8 +1,5 @@
-import {CITIES, TYPES} from "../mock/point";
 import EditOffers from "./edit-offers";
 import SmartView from "./smart-view";
-import {getAvailableOffers} from "../mock/offer";
-import {destinationInfo} from '../mock/info';
 
 import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 import flatpickr from 'flatpickr';
@@ -10,14 +7,17 @@ import dayjs from 'dayjs';
 
 const MIN_START_END_DATE_DIFFERENCE_IN_MINUTES = 5;
 
-const createDestinationlist = () => {
-  return CITIES.slice()
+const createDestinationList = (destinationModel) => {
+  const cities = Array.from(destinationModel.destinations.keys());
+  return cities.slice()
     .map((city) => `<option value="${city}"></option>`).join(``);
 };
 
-const createPointTypeList = (point) => {
+const createPointTypeList = (point, offersModel) => {
   const {id, type} = point;
-  return TYPES.map((typeName) => {
+  const types = Array.from(offersModel.offers.keys());
+  return types.map((typeName) => {
+    typeName = typeName.charAt(0).toUpperCase() + typeName.slice(1);
     const lowerCaseName = typeName.toLowerCase();
     return `
       <div class="event__type-item">
@@ -28,9 +28,18 @@ const createPointTypeList = (point) => {
   }).join(``);
 };
 
+const getPhotos = (photos) => {
+  return photos.length > 0 ? photos.map(({
+    src,
+    photoDescription,
+  }) => {
+    return `<img class="event__photo" src="${src}" alt="${photoDescription}">`;
+  }).join(``) : ``;
+};
+
 const getDestination = (point) => {
   const {
-    info: {description = ``, photos = []},
+    info: {description = ``, pictures = []},
   } = point;
   let res = ``;
   if (description) {
@@ -40,7 +49,7 @@ const getDestination = (point) => {
 
               <div class="event__photos-container">
                 <div class="event__photos-tape">
-                    ${photos.length > 0 ? photos.map((src) => `<img class="event__photo" src="${src}" alt="Event photo">`).join(``) : ``}
+                    ${getPhotos(pictures)}
                 </div>
               </div>
             </section>`;
@@ -55,10 +64,10 @@ const getRollupButton = (isNew) => {
                         </button>`;
 };
 
-const createEditFormTemplate = (point, isNewForm) => {
+const createEditFormTemplate = (point, offerModel, destinationModel, isNewForm) => {
   const {
     id = ``,
-    type = TYPES[0],
+    type = offerModel.offers.keys()[0],
     destination = ``,
     startDate, endDate,
     price = ``,
@@ -80,7 +89,7 @@ const createEditFormTemplate = (point, isNewForm) => {
                     <div class="event__type-list">
                       <fieldset class="event__type-group">
                         <legend class="visually-hidden">Event type</legend>
-                        ${createPointTypeList(point)}
+                        ${createPointTypeList(point, offerModel)}
                       </fieldset>
                     </div>
                   </div>
@@ -91,7 +100,7 @@ const createEditFormTemplate = (point, isNewForm) => {
                     </label>
                     <input class="event__input  event__input--destination" id="event-destination-${id}" type="text" name="event-destination" value="${destination}" list="destination-list-${id}" required>
                     <datalist id="destination-list-${id}">
-                        ${createDestinationlist()}
+                        ${createDestinationList(destinationModel)}
                     </datalist>
                   </div>
 
@@ -117,9 +126,9 @@ const createEditFormTemplate = (point, isNewForm) => {
                 </header>
                 <section class="event__details">
                   <section class="event__section  event__section--offers">
-                    ${getAvailableOffers(type).length > 0 ? ` <h3 class="event__section-title  event__section-title--offers">Offers</h3>
+                    ${offerModel.getAvailableOffers(type).length > 0 ? ` <h3 class="event__section-title  event__section-title--offers">Offers</h3>
                      <div class="event__available-offers">
-                            ${new EditOffers(point).getTemplate()}
+                            ${new EditOffers(point, offerModel).getTemplate()}
                     </div>` : ``}
                   </section>
 
@@ -130,8 +139,10 @@ const createEditFormTemplate = (point, isNewForm) => {
 };
 
 class EditForm extends SmartView {
-  constructor(point, isNewForm = false) {
+  constructor(point, offerModel, destinationModel, isNewForm = false) {
     super(point);
+    this._offerModel = offerModel;
+    this._destinationModel = destinationModel;
     this._isNewForm = isNewForm;
     this._startDatePicker = null;
     this._endDatePicker = null;
@@ -208,7 +219,8 @@ class EditForm extends SmartView {
     const price = +element.querySelector(`.event__input--price`).value;
     const destination = element.querySelector(`.event__input--destination`).value;
     const saveButton = element.querySelector(`.event__save-btn`);
-    const isInputDataValid = Number.isInteger(price) && CITIES.indexOf(destination) !== -1;
+    const cities = Array.from(this._destinationModel.destinations.keys());
+    const isInputDataValid = Number.isInteger(price) && cities.indexOf(destination) !== -1;
     saveButton.disabled = !isInputDataValid;
   }
 
@@ -225,11 +237,13 @@ class EditForm extends SmartView {
   _changeDestinationHandler(evt) {
     evt.preventDefault();
     const newDestination = evt.target.value;
-    const pointInfo = destinationInfo.get(newDestination);
-    if ((this._state.destination !== newDestination) && pointInfo) {
-      this.updateData({info: pointInfo, destination: newDestination});
+    if (newDestination) {
+      const pointInfo = this._destinationModel.getDestinationInfo(newDestination);
+      if ((this._state.destination !== newDestination) && pointInfo) {
+        this.updateData({info: pointInfo, destination: newDestination});
+      }
+      this._checkIsValidForm();
     }
-    this._checkIsValidForm();
   }
 
   setChangeDestinationHandler() {
@@ -238,8 +252,7 @@ class EditForm extends SmartView {
 
   _pointTypeHandler(evt) {
     evt.preventDefault();
-    let value = evt.target.value;
-    value = `${value.charAt(0).toUpperCase()}${value.slice(1)}`;
+    const value = evt.target.value;
     this.updateData({type: value, offers: []});
   }
 
@@ -250,12 +263,12 @@ class EditForm extends SmartView {
   _offerChooseHandler(evt) {
     evt.preventDefault();
 
-    const name = evt.target.name;
+    const title = evt.target.name;
     const isChecked = evt.target.checked;
-    const availableOffers = this._state.availableOffers;
+    const availableOffers = this._offerModel.getAvailableOffers(this._state.type);
     const pointOffers = this._state.offers.slice();
 
-    const offer = availableOffers.find((curOffer) => curOffer.name === name);
+    const offer = availableOffers.find((curOffer) => curOffer.title === title);
     if (isChecked) {
       pointOffers.push(offer);
     } else {
@@ -281,14 +294,14 @@ class EditForm extends SmartView {
     this._cb.submit(this._state);
   }
 
-  setClickArrowHandler(cb) {
-    this._cb.clickArrow = cb;
-    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._clickArrowHandler);
-  }
-
   _clickArrowHandler(evt) {
     evt.preventDefault();
     this._cb.clickArrow();
+  }
+
+  setClickArrowHandler(cb) {
+    this._cb.clickArrow = cb;
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._clickArrowHandler);
   }
 
   setDeleteButtonHandler(cb) {
@@ -302,7 +315,7 @@ class EditForm extends SmartView {
   }
 
   getTemplate() {
-    return createEditFormTemplate(this._state, this._isNewForm);
+    return createEditFormTemplate(this._state, this._offerModel, this._destinationModel, this._isNewForm);
   }
 
   restoreHandlers() {
@@ -316,11 +329,6 @@ class EditForm extends SmartView {
     this.setChangeDestinationHandler();
     this._setDatePickers();
     this.setChangePriceHandler();
-  }
-
-  updateData(changedData, needReload = true) {
-    super.updateData(changedData, needReload);
-    this._state.availableOffers = getAvailableOffers(this._state.type);
   }
 }
 

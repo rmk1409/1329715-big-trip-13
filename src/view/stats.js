@@ -1,6 +1,5 @@
 import Chart from "chart.js";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import {TYPES} from "../mock/point";
 import AbstractView from "./abstract-view";
 
 const BAR_HEIGHT = 55;
@@ -24,10 +23,14 @@ const createStatsTemplate = () => {
           </section>`;
 };
 
-const getTypeMoneyMap = (points) => {
+const getTypes = (offerModel) => {
+  return Array.from(offerModel.offers.keys());
+};
+
+const getTypeMoneyMap = (points, offerModel) => {
   const result = new Map();
 
-  TYPES.forEach((type) => {
+  getTypes(offerModel).forEach((type) => {
     const money = Object.values(points).reduce((accumulator, currentPoint) => {
       let accumulatorResult = accumulator;
       if (currentPoint.type === type) {
@@ -44,10 +47,10 @@ const getTypeMoneyMap = (points) => {
   return result;
 };
 
-const getTypeTimesMap = (points) => {
+const getTypeTimesMap = (points, offerModel) => {
   const result = new Map();
 
-  TYPES.forEach((type) => {
+  getTypes(offerModel).forEach((type) => {
     const times = Object.values(points).reduce((accumulator, currentPoint) => {
       let accumulatorResult = accumulator;
       if (currentPoint.type === type) {
@@ -64,10 +67,10 @@ const getTypeTimesMap = (points) => {
   return result;
 };
 
-const getTypeDaysMap = (points) => {
+const getTypeDaysMap = (points, offerModel) => {
   const result = new Map();
 
-  TYPES.forEach((type) => {
+  getTypes(offerModel).forEach((type) => {
     const minutes = Object.values(points).reduce((accumulator, currentPoint) => {
       let accumulatorResult = accumulator;
       if (currentPoint.type === type) {
@@ -85,8 +88,8 @@ const getTypeDaysMap = (points) => {
   return result;
 };
 
-const renderMoneyChart = (canvas, points) => {
-  const typeMoney = getTypeMoneyMap(points);
+const renderMoneyChart = (canvas, points, offerModel) => {
+  const typeMoney = getTypeMoneyMap(points, offerModel);
   const data = Array.from(typeMoney.keys());
   const values = Array.from(typeMoney.values());
 
@@ -158,8 +161,8 @@ const renderMoneyChart = (canvas, points) => {
   });
 };
 
-const renderTransportChart = (canvas, points) => {
-  const typeMoney = getTypeTimesMap(points);
+const renderTransportChart = (canvas, points, offerModel) => {
+  const typeMoney = getTypeTimesMap(points, offerModel);
   const data = Array.from(typeMoney.keys());
   const values = Array.from(typeMoney.values());
 
@@ -231,8 +234,8 @@ const renderTransportChart = (canvas, points) => {
   });
 };
 
-const renderTimeChart = (canvas, points) => {
-  const typeMoney = getTypeDaysMap(points);
+const renderTimeChart = (canvas, points, offerModel) => {
+  const typeMoney = getTypeDaysMap(points, offerModel);
   const data = Array.from(typeMoney.keys());
   const values = Array.from(typeMoney.values());
 
@@ -305,10 +308,11 @@ const renderTimeChart = (canvas, points) => {
 };
 
 class Stats extends AbstractView {
-  constructor(points) {
+  constructor(points, offerModel) {
     super();
 
     this._points = points.slice();
+    this._offerModel = offerModel;
 
     this._moneyChart = null;
     this._transportChart = null;
@@ -326,9 +330,9 @@ class Stats extends AbstractView {
     const transportCanvas = this.getElement().querySelector(`.statistics__chart--transport`);
     const timeCanvas = this.getElement().querySelector(`.statistics__chart--time`);
 
-    this._moneyChart = renderMoneyChart(moneyCanvas, this._points);
-    this._transportChart = renderTransportChart(transportCanvas, this._points);
-    this._timeChart = renderTimeChart(timeCanvas, this._points);
+    this._moneyChart = renderMoneyChart(moneyCanvas, this._points, this._offerModel);
+    this._transportChart = renderTransportChart(transportCanvas, this._points, this._offerModel);
+    this._timeChart = renderTimeChart(timeCanvas, this._points, this._offerModel);
   }
 }
 
