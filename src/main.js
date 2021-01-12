@@ -71,4 +71,4 @@ Promise.all([offersPromise, destinationPromise, pointsPromise])
     offersModel.offers = offersData;
     destinationModel.destinations = destinationData;
     pointsModel.points = pointsData;
-  });
+  }).catch((resp)=>console.log(`some error`, resp));

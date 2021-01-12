@@ -40,8 +40,8 @@ class Server {
     return resp;
   }
 
-  _onRejected(err) {
-    throw err;
+  _onRejected() {
+    return [];
   }
 
   _sendRequest(requestData) {
