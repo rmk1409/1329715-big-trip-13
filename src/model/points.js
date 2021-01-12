@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import Observable from "../util/pattern/observer/observable";
 import {UpdateType} from "../util/const";
 import * as dayjs from "dayjs";
@@ -57,11 +58,28 @@ class Points extends Observable {
     return adaptedPoint;
   }
 
-  // static adaptToServer(point) {
-  //   const adaptedPoint = null;
-  //
-  //   return adaptedPoint;
-  // }
+  static adaptToServer(point) {
+    const {
+      isFavorite: is_favorite,
+      price: base_price,
+      date_from = new Date(point.startDate),
+      date_to = new Date(point.endDate),
+    } = point;
+
+    const adaptedPoint = Object.assign({}, point, {is_favorite, base_price, date_from, date_to});
+    adaptedPoint.destination = {
+      name: point.destination,
+      description: point.info.description,
+      pictures: point.info.pictures,
+    };
+
+    delete adaptedPoint.isFavorite;
+    delete adaptedPoint.price;
+    delete adaptedPoint.startDate;
+    delete adaptedPoint.endDate;
+
+    return adaptedPoint;
+  }
 }
 
 export {Points};

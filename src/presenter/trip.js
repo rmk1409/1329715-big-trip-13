@@ -9,6 +9,7 @@ import {ActionType, UpdateType} from "../util/const";
 import NewPoint from "./newPoint";
 import {FilterFunction, FilterType} from "../model/filter";
 import {Loading as LoadingView} from "../view/loading";
+import {Points as PointsModel} from "../model/points";
 
 const SortMode = {
   DEFAULT: `sort-day`,
@@ -22,9 +23,10 @@ sortMap.set(SortMode.TIME, (a, b) => a.endDate.diff(a.startDate) - b.endDate.dif
 sortMap.set(SortMode.PRICE, (a, b) => a.price - b.price);
 
 class Trip {
-  constructor(tripInfoContainer, pointsInfoContainer, pointsModel, filterModel, offerModel, destinationModel) {
+  constructor(tripInfoContainer, pointsInfoContainer, pointsModel, filterModel, offerModel, destinationModel, server) {
     this._tripInfoContainer = tripInfoContainer;
     this._pointsInfoContainer = pointsInfoContainer;
+    this._server = server;
 
     this._sortView = null;
     this._pointListView = new TripEventsList();
@@ -167,7 +169,9 @@ class Trip {
         this._pointsModel.addPoint(updatedPoint);
         break;
       case ActionType.UPDATE:
-        this._pointsModel.updatePoint(updateType, updatedPoint);
+        this._server.updatePoint(updatedPoint).then((response) => {
+          this._pointsModel.updatePoint(updateType, PointsModel.adaptToClient(response));
+        });
         break;
       case ActionType.DELETE:
         this._pointsModel.deletePoint(updatedPoint);

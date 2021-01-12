@@ -21,7 +21,12 @@ const filterModel = new FilterModel();
 const offersModel = new OffersModel();
 const destinationModel = new DestinationModel();
 
-const tripPresenter = new TripPresenter(tripMain, tripEvents, pointsModel, filterModel, offersModel, destinationModel);
+const endPoint = `https://13.ecmascript.pages.academy/big-trip/`;
+const authorizationKey = `Basic z{NDj5DNr+].tL3g`;
+
+const server = new Server(endPoint, authorizationKey);
+
+const tripPresenter = new TripPresenter(tripMain, tripEvents, pointsModel, filterModel, offersModel, destinationModel, server);
 const filterPresenter = new FilterPresenter(filterHeader, pointsModel, filterModel);
 tripPresenter.init();
 filterPresenter.init();
@@ -57,18 +62,13 @@ const menuClickHandler = (value) => {
 
 menuView.setMenuClickHandler(menuClickHandler);
 
-const endPoint = `https://13.ecmascript.pages.academy/big-trip/`;
-const authorizationKey = `Basic z{NDj5DNr+].tL3g`;
-
-const server = new Server(endPoint, authorizationKey);
-
 const offersPromise = server.getData(`offers`);
 const destinationPromise = server.getData(`destinations`);
-
 const pointsPromise = server.getData(`points`);
+
 Promise.all([offersPromise, destinationPromise, pointsPromise])
   .then(([offersData, destinationData, pointsData]) => {
     offersModel.offers = offersData;
     destinationModel.destinations = destinationData;
     pointsModel.points = pointsData;
-  }).catch((resp)=>console.log(`some error`, resp));
+  });

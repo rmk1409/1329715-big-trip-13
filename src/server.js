@@ -18,16 +18,14 @@ class Server {
         promise = promise.then((points) => points.map(PointsModel.adaptToClient));
         break;
     }
-    return promise;
+    return promise.catch(this._onRejected);
   }
 
   updatePoint(updatedPoint) {
     return this._sendRequest({
       url: `points/${updatedPoint.id}`,
       method: Method.PUT,
-      // TODO Add adapt to Server
-      body: JSON.stringify(updatedPoint),
-      // TODO try to update without content-type header.
+      body: JSON.stringify(PointsModel.adaptToServer(updatedPoint)),
       headers: new Headers({"Content-Type": `application/json`}),
     });
   }
@@ -52,8 +50,7 @@ class Server {
 
     return fetch(fullUrl, {method, body, headers})
       .then(this._checkStatus)
-      .then((resp) => resp.json())
-      .catch(this._onRejected);
+      .then((resp) => resp.json());
   }
 }
 
