@@ -23,4 +23,10 @@ const MenuItem = {
   NEW_EVENT: `New event`
 };
 
-export {ActionType, UpdateType, MenuItem};
+const State = {
+  SAVING: `Saving`,
+  DELETING: `Deleting`,
+  UNLOCK: `Unlocking`
+};
+
+export {ActionType, UpdateType, MenuItem, State};

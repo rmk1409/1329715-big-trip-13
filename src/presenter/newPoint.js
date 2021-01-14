@@ -1,5 +1,5 @@
 import EditForm from "../view/edit-form";
-import {ActionType, UpdateType} from "../util/const";
+import {ActionType, State, UpdateType} from "../util/const";
 import dayjs from "dayjs";
 import {render, RenderPosition} from "../util/render";
 
@@ -40,11 +40,30 @@ export default class NewPoint {
   }
 
   _submitHandler(point) {
-    this.closeForm();
     this._changePointsModelHander(point, ActionType.ADD, UpdateType.MAJOR);
   }
 
   closeForm() {
     this._editFormComponent.getElement().remove();
+  }
+
+  setViewState(state) {
+    const unlock = () => {
+      this._editFormComponent.updateData({
+        isDeleting: false,
+        isSaving: false,
+      });
+    };
+
+    switch (state) {
+      case State.SAVING:
+        this._editFormComponent.updateData({
+          isSaving: true,
+        });
+        break;
+      case State.UNLOCK:
+        this._editFormComponent.shake(unlock);
+        break;
+    }
   }
 }

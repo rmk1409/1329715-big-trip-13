@@ -71,11 +71,19 @@ const createEditFormTemplate = (point, offerModel, destinationModel, isNewForm) 
     destination = ``,
     startDate, endDate,
     price = ``,
+    isSaving,
+    isDeleting,
   } = point;
 
   const startDateAndTime = startDate ? startDate.format(`DD/MM/YY MM:HH`) : ``;
   const endDateAndTime = endDate ? endDate.format(`DD/MM/YY MM:HH`) : ``;
 
+  const isDisabled = !!isSaving || !!isDeleting;
+  const disabledAttribute = isDisabled ? `disabled` : ``;
+  let resetButtonText = `Cancel`;
+  if (!isNewForm) {
+    resetButtonText = isDeleting ? `Deleting` : `Delete`;
+  }
   return `<li class="trip-events__item">
               <form class="event event--edit" action="#" method="post">
                 <header class="event__header">
@@ -84,7 +92,7 @@ const createEditFormTemplate = (point, offerModel, destinationModel, isNewForm) 
                       <span class="visually-hidden">Choose event type</span>
                       <img class="event__type-icon" width="17" height="17" src="img/icons/${type ? type.toLowerCase() : `taxi`}.png" alt="Event type icon">
                     </label>
-                    <input class="event__type-toggle  visually-hidden" id="event-type-toggle-${id}" type="checkbox">
+                    <input class="event__type-toggle  visually-hidden" id="event-type-toggle-${id}" type="checkbox" ${disabledAttribute}>
 
                     <div class="event__type-list">
                       <fieldset class="event__type-group">
@@ -98,7 +106,7 @@ const createEditFormTemplate = (point, offerModel, destinationModel, isNewForm) 
                     <label class="event__label  event__type-output" for="event-destination-${id}">
                       ${type}
                     </label>
-                    <input class="event__input  event__input--destination" id="event-destination-${id}" type="text" name="event-destination" value="${destination}" list="destination-list-${id}" required>
+                    <input class="event__input  event__input--destination" id="event-destination-${id}" type="text" name="event-destination" value="${destination}" list="destination-list-${id}" required ${disabledAttribute}>
                     <datalist id="destination-list-${id}">
                         ${createDestinationList(destinationModel)}
                     </datalist>
@@ -106,10 +114,10 @@ const createEditFormTemplate = (point, offerModel, destinationModel, isNewForm) 
 
                   <div class="event__field-group  event__field-group--time">
                     <label class="visually-hidden" for="event-start-time-${id}">From</label>
-                    <input class="event__input  event__input--time" id="event-start-time-${id}" type="text" name="event-start-time" value="${startDateAndTime}">
+                    <input class="event__input  event__input--time" id="event-start-time-${id}" type="text" name="event-start-time" value="${startDateAndTime}" ${disabledAttribute}>
                     &mdash;
                     <label class="visually-hidden" for="event-end-time-${id}">To</label>
-                    <input class="event__input  event__input--time" id="event-end-time-${id}" type="text" name="event-end-time" value="${endDateAndTime}">
+                    <input class="event__input  event__input--time" id="event-end-time-${id}" type="text" name="event-end-time" value="${endDateAndTime}" ${disabledAttribute}>
                   </div>
 
                   <div class="event__field-group  event__field-group--price">
@@ -117,18 +125,18 @@ const createEditFormTemplate = (point, offerModel, destinationModel, isNewForm) 
                       <span class="visually-hidden">Price</span>
                       &euro;
                     </label>
-                    <input class="event__input  event__input--price" id="event-price-${id}" type="text" name="event-price" value="${price}" required>
+                    <input class="event__input  event__input--price" id="event-price-${id}" type="text" name="event-price" value="${price}" required ${disabledAttribute}>
                   </div>
 
-                  <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-                  <button class="event__reset-btn" type="reset">${isNewForm ? `Cancel` : `Delete`}</button>
+                  <button class="event__save-btn  btn  btn--blue" type="submit" ${disabledAttribute}>${isSaving ? `Saving` : `Save`}</button>
+                  <button class="event__reset-btn" type="reset" ${disabledAttribute}>${resetButtonText}</button>
                   ${getRollupButton(isNewForm)}
                 </header>
                 <section class="event__details">
                   <section class="event__section  event__section--offers">
                     ${offerModel.getAvailableOffers(type).length > 0 ? ` <h3 class="event__section-title  event__section-title--offers">Offers</h3>
                      <div class="event__available-offers">
-                            ${new EditOffers(point, offerModel).getTemplate()}
+                            ${new EditOffers(point, offerModel, isDisabled).getTemplate()}
                     </div>` : ``}
                   </section>
 
@@ -239,7 +247,8 @@ class EditForm extends SmartView {
     const newDestination = evt.target.value;
     if (newDestination) {
       const pointInfo = this._destinationModel.getDestinationInfo(newDestination);
-      if ((this._state.destination !== newDestination) && pointInfo) {
+      const isEmpty = (Object.keys(pointInfo).length === 0) && (pointInfo.constructor === Object);
+      if ((this._state.destination !== newDestination) && !isEmpty) {
         this.updateData({info: pointInfo, destination: newDestination});
       }
       this._checkIsValidForm();
@@ -329,6 +338,7 @@ class EditForm extends SmartView {
     this.setChangeDestinationHandler();
     this._setDatePickers();
     this.setChangePriceHandler();
+    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, this._deleteHandler);
   }
 }
 

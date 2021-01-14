@@ -60,11 +60,12 @@ class Points extends Observable {
 
   static adaptToServer(point) {
     const {
-      isFavorite: is_favorite,
       price: base_price,
       date_from = new Date(point.startDate),
       date_to = new Date(point.endDate),
     } = point;
+
+    const is_favorite = !!point.isFavorite;
 
     const adaptedPoint = Object.assign({}, point, {is_favorite, base_price, date_from, date_to});
     adaptedPoint.destination = {

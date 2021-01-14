@@ -10,21 +10,21 @@ import {Server} from "./server";
 import {Offers as OffersModel} from "./model/offers";
 import {Destination as DestinationModel} from "./model/destination";
 
+const END_POINT = `https://13.ecmascript.pages.academy/big-trip/`;
+const AUTHORIZATION_KEY = `Basic tRCyBa6sgC)zar>`;
+
 const pageBody = document.querySelector(`.page-main .page-body__container`);
 const tripMain = document.querySelector(`.trip-main`);
 const tripEvents = pageBody.querySelector(`.trip-events`);
+
 const filterHeader = tripMain.querySelector(`.trip-controls h2:nth-of-type(2)`);
-
 const pointsModel = new PointsModel();
-const filterModel = new FilterModel();
 
+const filterModel = new FilterModel();
 const offersModel = new OffersModel();
 const destinationModel = new DestinationModel();
 
-const endPoint = `https://13.ecmascript.pages.academy/big-trip/`;
-const authorizationKey = `Basic z{NDj5DNr+].tL3g`;
-
-const server = new Server(endPoint, authorizationKey);
+const server = new Server(END_POINT, AUTHORIZATION_KEY);
 
 const tripPresenter = new TripPresenter(tripMain, tripEvents, pointsModel, filterModel, offersModel, destinationModel, server);
 const filterPresenter = new FilterPresenter(filterHeader, pointsModel, filterModel);

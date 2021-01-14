@@ -3,6 +3,8 @@ import {Points as PointsModel} from "./model/points";
 const Method = {
   GET: `GET`,
   PUT: `PUT`,
+  POST: `POST`,
+  DELETE: `DELETE`,
 };
 
 class Server {
@@ -12,7 +14,7 @@ class Server {
   }
 
   getData(requestedData) {
-    let promise = this._sendRequest({url: `${requestedData}`});
+    let promise = this._sendRequest({url: `${requestedData}`}).then(this._toJSON);
     switch (requestedData) {
       case `points`:
         promise = promise.then((points) => points.map(PointsModel.adaptToClient));
@@ -27,7 +29,28 @@ class Server {
       method: Method.PUT,
       body: JSON.stringify(PointsModel.adaptToServer(updatedPoint)),
       headers: new Headers({"Content-Type": `application/json`}),
+    }).then(this._toJSON);
+  }
+
+  addPoint(newPoint) {
+    const toServer = PointsModel.adaptToServer(newPoint);
+    return this._sendRequest({
+      url: `points`,
+      method: Method.POST,
+      body: JSON.stringify(toServer),
+      headers: new Headers({"Content-Type": `application/json`}),
+    }).then(this._toJSON);
+  }
+
+  deletePoint(id) {
+    return this._sendRequest({
+      url: `points/${id}`,
+      method: Method.DELETE,
     });
+  }
+
+  _toJSON(resp) {
+    return resp.json();
   }
 
   _checkStatus(resp) {
@@ -49,8 +72,7 @@ class Server {
     const fullUrl = `${this._endPoint}/${url}`;
 
     return fetch(fullUrl, {method, body, headers})
-      .then(this._checkStatus)
-      .then((resp) => resp.json());
+      .then(this._checkStatus);
   }
 }
 

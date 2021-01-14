@@ -12,7 +12,7 @@ class Destination {
   }
 
   getDestinationInfo(destination) {
-    return this._destinationInfo.get(destination) || [];
+    return this._destinationInfo.get(destination) || {};
   }
 }
 
