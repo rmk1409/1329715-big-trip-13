@@ -58,8 +58,8 @@ const getDestination = (point) => {
   return res;
 };
 
-const getRollupButton = (isNew) => {
-  return isNew ? `` : ` <button class="event__rollup-btn" type="button">
+const getRollupButton = (isNew, isDisabled) => {
+  return isNew ? `` : ` <button class="event__rollup-btn" type="button" ${isDisabled ? `disabled` : ``}>
                           <span class="visually-hidden">Open event</span>
                         </button>`;
 };
@@ -130,7 +130,7 @@ const createEditFormTemplate = (point, offerModel, destinationModel, isNewForm) 
 
                   <button class="event__save-btn  btn  btn--blue" type="submit" ${disabledAttribute}>${isSaving ? `Saving` : `Save`}</button>
                   <button class="event__reset-btn" type="reset" ${disabledAttribute}>${resetButtonText}</button>
-                  ${getRollupButton(isNewForm)}
+                  ${getRollupButton(isNewForm, isDisabled)}
                 </header>
                 <section class="event__details">
                   <section class="event__section  event__section--offers">

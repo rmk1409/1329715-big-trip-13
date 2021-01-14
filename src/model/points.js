@@ -65,9 +65,7 @@ class Points extends Observable {
       date_to = new Date(point.endDate),
     } = point;
 
-    const is_favorite = !!point.isFavorite;
-
-    const adaptedPoint = Object.assign({}, point, {is_favorite, base_price, date_from, date_to});
+    const adaptedPoint = Object.assign({}, point, {is_favorite: !!point.isFavorite, base_price, date_from, date_to});
     adaptedPoint.destination = {
       name: point.destination,
       description: point.info.description,

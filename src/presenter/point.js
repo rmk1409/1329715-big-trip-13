@@ -19,6 +19,7 @@ class Point {
 
     this._offerModel = offerModel;
     this._destinationModel = destinationModel;
+    this._isFormOpened = false;
   }
 
   _createComponents() {
@@ -47,11 +48,16 @@ class Point {
     this._point = point;
 
     const previousEvtComponent = this._evtComponent;
+    const previousFormComponent = this._editFormComponent;
 
     this._createComponents();
     this._setHandlersToComponents();
 
-    replace(this._evtComponent, previousEvtComponent);
+    if (this._isFormOpened) {
+      replace(this._editFormComponent, previousFormComponent);
+    } else {
+      replace(this._evtComponent, previousEvtComponent);
+    }
   }
 
   _clickDeleteButton() {
@@ -88,6 +94,7 @@ class Point {
   }
 
   _pointToForm() {
+    this._isFormOpened = true;
     this._openedPointPresenterSetter(this);
     replace(this._editFormComponent, this._evtComponent);
   }
@@ -97,32 +104,45 @@ class Point {
   }
 
   toggleFormToPoint() {
+    this._isFormOpened = false;
     this._openedPointPresenterSetter(null);
     replace(this._evtComponent, this._editFormComponent);
   }
 
   setViewState(state) {
+    const arrowButton = this._evtComponent.getElement().querySelector(`.event__rollup-btn`);
     const unlock = () => {
-      this._editFormComponent.updateData({
+      const resetObject = {
         isDeleting: false,
         isSaving: false,
-      });
+      };
+      arrowButton.disabled = false;
+      if (this._isFormOpened) {
+        this._editFormComponent.updateData(resetObject);
+      } else {
+        this._evtComponent.updateData(resetObject);
+      }
     };
 
     switch (state) {
       case State.SAVING:
-        this._editFormComponent.updateData({
-          isSaving: true,
-        });
+        arrowButton.disabled = true;
+        if (this._isFormOpened) {
+          this._editFormComponent.updateData({isSaving: true});
+        } else {
+          this._evtComponent.updateData({isSaving: true}, false);
+        }
         break;
       case State.DELETING:
-        this._editFormComponent.updateData({
-          isDeleting: true,
-        });
+        arrowButton.disabled = true;
+        this._editFormComponent.updateData({isDeleting: true});
         break;
       case State.UNLOCK:
-        this._editFormComponent.shake(unlock);
-        this._evtComponent.shake(unlock);
+        if (this._isFormOpened) {
+          this._editFormComponent.shake(unlock);
+        } else {
+          this._evtComponent.shake(unlock);
+        }
         break;
     }
   }
