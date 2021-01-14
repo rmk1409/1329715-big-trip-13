@@ -46,8 +46,15 @@ export default class NewPoint {
   closeForm() {
     this._editFormComponent.getElement().remove();
   }
-  
+
   setViewState(state) {
+    const unlock = () => {
+      this._editFormComponent.updateData({
+        isDeleting: false,
+        isSaving: false,
+      });
+    };
+
     switch (state) {
       case State.SAVING:
         this._editFormComponent.updateData({
@@ -55,10 +62,7 @@ export default class NewPoint {
         });
         break;
       case State.UNLOCK:
-        this._editFormComponent.updateData({
-          isDeleting: false,
-          isSaving: false,
-        });
+        this._editFormComponent.shake(unlock);
         break;
     }
   }

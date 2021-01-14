@@ -102,6 +102,13 @@ class Point {
   }
 
   setViewState(state) {
+    const unlock = () => {
+      this._editFormComponent.updateData({
+        isDeleting: false,
+        isSaving: false,
+      });
+    };
+
     switch (state) {
       case State.SAVING:
         this._editFormComponent.updateData({
@@ -114,10 +121,8 @@ class Point {
         });
         break;
       case State.UNLOCK:
-        this._editFormComponent.updateData({
-          isDeleting: false,
-          isSaving: false,
-        });
+        this._editFormComponent.shake(unlock);
+        this._evtComponent.shake(unlock);
         break;
     }
   }
