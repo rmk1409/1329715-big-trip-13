@@ -25,7 +25,8 @@ const MenuItem = {
 
 const State = {
   SAVING: `Saving`,
-  DELETING: `Deleting`
+  DELETING: `Deleting`,
+  UNLOCK: `Unlocking`
 };
 
 export {ActionType, UpdateType, MenuItem, State};

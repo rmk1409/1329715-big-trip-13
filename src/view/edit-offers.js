@@ -19,14 +19,15 @@ const getEditOffers = (point, offerModel, isDisabled) => {
 };
 
 class EditOffers extends AbstractView {
-  constructor(point, offerModel) {
+  constructor(point, offerModel, isDisabled) {
     super();
     this._point = point;
     this._offerModel = offerModel;
+    this._isDisabled = isDisabled;
   }
 
   getTemplate() {
-    return getEditOffers(this._point, this._offerModel);
+    return getEditOffers(this._point, this._offerModel, this._isDisabled);
   }
 }
 

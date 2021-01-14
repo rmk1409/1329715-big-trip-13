@@ -79,7 +79,6 @@ class Point {
   }
 
   _submitHandler(point) {
-    // this.toggleFormToPoint();
     this._changePointsModelHander(point, ActionType.UPDATE, this._getUpdateType(point));
   }
 
@@ -112,6 +111,12 @@ class Point {
       case State.DELETING:
         this._editFormComponent.updateData({
           isDeleting: true,
+        });
+        break;
+      case State.UNLOCK:
+        this._editFormComponent.updateData({
+          isDeleting: false,
+          isSaving: false,
         });
         break;
     }

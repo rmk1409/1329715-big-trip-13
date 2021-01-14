@@ -164,24 +164,50 @@ class Trip {
   }
 
   _changePointsModelHandler(updatedPoint, actionType, updateType) {
+    const currentPointPresenter = this._pointPresenters.get(updatedPoint.id);
     switch (actionType) {
       case ActionType.ADD:
-        this.newPoint.setSaving();
-        this._server.addPoint(updatedPoint).then((response) => {
-          this._pointsModel.addPoint(PointsModel.adaptToClient(response));
-        });
+        this.newPoint.setViewState(State.SAVING);
+        this._server.addPoint(updatedPoint)
+          .then((response) => {
+            this.newPoint.closeForm();
+            return response;
+          })
+          .then((response) => {
+            this._pointsModel.addPoint(PointsModel.adaptToClient(response));
+          })
+          .catch(() => {
+            this.newPoint.setViewState(State.UNLOCK);
+          });
         break;
       case ActionType.UPDATE:
-        this._pointPresenters.get(updatedPoint.id).setViewState(State.SAVING);
-        this._server.updatePoint(updatedPoint).then((response) => {
-          this._pointsModel.updatePoint(updateType, PointsModel.adaptToClient(response));
-        });
+        currentPointPresenter.setViewState(State.SAVING);
+        this._server.updatePoint(updatedPoint)
+          .then((response) => {
+            if (this._openedPointPresenter) {
+              currentPointPresenter.toggleFormToPoint();
+            }
+            return response;
+          })
+          .then((response) => {
+            this._pointsModel.updatePoint(updateType, PointsModel.adaptToClient(response));
+          })
+          .catch(() => {
+            currentPointPresenter.setViewState(State.UNLOCK);
+          });
         break;
       case ActionType.DELETE:
-        this._pointPresenters.get(updatedPoint.id).setViewState(State.DELETING);
-        this._server.deletePoint(updatedPoint.id).then(() => {
-          this._pointsModel.deletePoint(updatedPoint);
-        });
+        currentPointPresenter.setViewState(State.DELETING);
+        this._server.deletePoint(updatedPoint.id)
+          .then(() => {
+            currentPointPresenter.toggleFormToPoint();
+          })
+          .then(() => {
+            this._pointsModel.deletePoint(updatedPoint);
+          })
+          .catch(() => {
+            currentPointPresenter.setViewState(State.UNLOCK);
+          });
         break;
     }
   }

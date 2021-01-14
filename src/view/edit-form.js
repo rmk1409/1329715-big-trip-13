@@ -338,6 +338,7 @@ class EditForm extends SmartView {
     this.setChangeDestinationHandler();
     this._setDatePickers();
     this.setChangePriceHandler();
+    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, this._deleteHandler);
   }
 }
 
