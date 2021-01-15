@@ -72,3 +72,7 @@ Promise.all([offersPromise, destinationPromise, pointsPromise])
     destinationModel.destinations = destinationData;
     pointsModel.points = pointsData;
   });
+
+window.addEventListener(`load`, () => {
+  navigator.serviceWorker.register(`/sw.js`);
+});
