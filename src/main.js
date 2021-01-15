@@ -6,7 +6,7 @@ import {Stats as StatsView} from "./view/stats";
 import {remove, render, RenderPosition} from "./util/render";
 import {Menu as MenuView} from "./view/menu";
 import {MenuItem} from "./util/const";
-import {Server} from "./server";
+import {Server} from "./api/server";
 import {Offers as OffersModel} from "./model/offers";
 import {Destination as DestinationModel} from "./model/destination";
 
