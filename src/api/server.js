@@ -17,7 +17,9 @@ class Server {
     let promise = this._sendRequest({url: `${requestedData}`}).then(this._toJSON);
     switch (requestedData) {
       case `points`:
-        promise = promise.then((points) => points.map(PointsModel.adaptToClient));
+        promise = promise.then((points) => {
+          return points.map(PointsModel.adaptToClient);
+        });
         break;
     }
     return promise.catch(this._onRejected);
@@ -69,7 +71,7 @@ class Server {
     const {url = ``, method = Method.GET, body = null, headers = new Headers()} = requestData;
     headers.append(`Authorization`, this._authorizationKey);
 
-    const fullUrl = `${this._endPoint}/${url}`;
+    const fullUrl = `${this._endPoint}${url}`;
 
     return fetch(fullUrl, {method, body, headers})
       .then(this._checkStatus);

@@ -1,33 +1,41 @@
 export default class Store {
-  constructor(key, storage) {
-    this._storage = storage;
-    this._storeKey = key;
+  constructor() {
+    this._storage = window.localStorage;
   }
 
-  getItems() {
+  getItems(key) {
     try {
-      return JSON.parse(this._storage.getItem(this._storeKey)) || {};
+      return JSON.parse(this._storage.getItem(key)) || [];
     } catch (err) {
-      return {};
+      return [];
     }
   }
 
-  setItems(items) {
-    this._storage.setItem(this._storeKey, JSON.stringify(items));
+  setItems(key, items) {
+    this._storage.setItem(key, JSON.stringify(items));
   }
 
-  setItem(key, value) {
-    const store = this.getItems();
+  setItem(key, id, value, isNewItem) {
+    const savedItems = this.getItems(key);
 
-    const newData = Object.assign({}, store, {[key]: value});
-    this._storage.setItem(this._storeKey, JSON.stringify(newData));
+    if (isNewItem) {
+      savedItems.push(value);
+    } else {
+      for (let i = 0; i < savedItems.length; i++) {
+        if (savedItems[i].id === id) {
+          savedItems[i] = value;
+          break;
+        }
+      }
+    }
+
+    this._storage.setItem(key, JSON.stringify(savedItems));
   }
 
-  removeItem(key) {
-    const store = this.getItems();
+  removeItem(key, id) {
+    const updatedItems = this.getItems()
+      .filter((item) => item.id !== id);
 
-    delete store[key];
-
-    this._storage.setItem(this._storeKey, JSON.stringify(store));
+    this._storage.setItem(key, JSON.stringify(updatedItems));
   }
 }
