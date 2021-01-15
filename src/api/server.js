@@ -74,6 +74,16 @@ class Server {
     return fetch(fullUrl, {method, body, headers})
       .then(this._checkStatus);
   }
+
+  sync(data) {
+    return this._sendRequest({
+      url: `points/sync`,
+      method: Method.POST,
+      body: JSON.stringify(data),
+      headers: new Headers({"Content-Type": `application/json`}),
+    })
+      .then(this._toJSON);
+  }
 }
 
 export {Server};
