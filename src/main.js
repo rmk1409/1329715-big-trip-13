@@ -6,12 +6,17 @@ import {Stats as StatsView} from "./view/stats";
 import {remove, render, RenderPosition} from "./util/render";
 import {Menu as MenuView} from "./view/menu";
 import {MenuItem} from "./util/const";
-import {Server} from "./server";
+import {Server} from "./api/server";
 import {Offers as OffersModel} from "./model/offers";
 import {Destination as DestinationModel} from "./model/destination";
+import Store from "./api/store";
+import {Provider} from "./api/provider";
+import {isOnline} from "./util/common";
+import {toast} from "./util/toast/toast";
 
 const END_POINT = `https://13.ecmascript.pages.academy/big-trip/`;
-const AUTHORIZATION_KEY = `Basic tRCyBa6sgC)zar>`;
+const AUTHORIZATION_KEY = `Basic tRCyBa6sgC)zar>10`;
+const OFFLINE_SUFFIX = ` [offline]`;
 
 const pageBody = document.querySelector(`.page-main .page-body__container`);
 const tripMain = document.querySelector(`.trip-main`);
@@ -25,8 +30,10 @@ const offersModel = new OffersModel();
 const destinationModel = new DestinationModel();
 
 const server = new Server(END_POINT, AUTHORIZATION_KEY);
+const store = new Store();
+const provider = new Provider(server, store);
 
-const tripPresenter = new TripPresenter(tripMain, tripEvents, pointsModel, filterModel, offersModel, destinationModel, server);
+const tripPresenter = new TripPresenter(tripMain, tripEvents, pointsModel, filterModel, offersModel, destinationModel, provider);
 const filterPresenter = new FilterPresenter(filterHeader, pointsModel, filterModel);
 tripPresenter.init();
 filterPresenter.init();
@@ -53,6 +60,10 @@ const menuClickHandler = (value) => {
     case MenuItem.NEW_EVENT:
       remove(statsView);
       menuView.resetMenuItems();
+      if (!isOnline()) {
+        toast(`You can't create new point offline`);
+        break;
+      }
       tripPresenter.hide();
       tripPresenter.show();
       tripPresenter.openNewPointForm();
@@ -62,9 +73,9 @@ const menuClickHandler = (value) => {
 
 menuView.setMenuClickHandler(menuClickHandler);
 
-const offersPromise = server.getData(`offers`);
-const destinationPromise = server.getData(`destinations`);
-const pointsPromise = server.getData(`points`);
+const offersPromise = provider.getData(`offers`);
+const destinationPromise = provider.getData(`destinations`);
+const pointsPromise = provider.getData(`points`);
 
 Promise.all([offersPromise, destinationPromise, pointsPromise])
   .then(([offersData, destinationData, pointsData]) => {
@@ -72,3 +83,16 @@ Promise.all([offersPromise, destinationPromise, pointsPromise])
     destinationModel.destinations = destinationData;
     pointsModel.points = pointsData;
   });
+
+window.addEventListener(`load`, () => {
+  navigator.serviceWorker.register(`/sw.js`);
+});
+
+window.addEventListener(`online`, () => {
+  document.title = document.title.replace(OFFLINE_SUFFIX, ``);
+  provider.sync();
+});
+
+window.addEventListener(`offline`, () => {
+  document.title += OFFLINE_SUFFIX;
+});

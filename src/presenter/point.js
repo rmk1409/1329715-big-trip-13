@@ -2,6 +2,8 @@ import EditForm from '../view/edit-form';
 import TripEventsItem from '../view/trip-events-item';
 import {render, RenderPosition, replace} from '../util/render';
 import {ActionType, State, UpdateType} from "../util/const";
+import {isOnline} from "../util/common";
+import {toast} from "../util/toast/toast";
 
 class Point {
   constructor(pointsListContainer, openedPointPresenterSetter, changePointsModelHandler, offerModel, destinationModel) {
@@ -61,7 +63,11 @@ class Point {
   }
 
   _clickDeleteButton() {
-    this._changePointsModelHander(this._point, ActionType.DELETE, UpdateType.MAJOR);
+    if (isOnline()) {
+      this._changePointsModelHander(this._point, ActionType.DELETE, UpdateType.MAJOR);
+    } else {
+      toast(`You can't delete point offline`);
+    }
   }
 
   _clickFavoriteHandler() {
@@ -70,7 +76,11 @@ class Point {
   }
 
   _clickArrowHandler() {
-    this._pointToForm();
+    if (isOnline()) {
+      this._pointToForm();
+    } else {
+      toast(`You can't edit point offline`);
+    }
   }
 
   _getUpdateType(newPoint) {
@@ -85,7 +95,11 @@ class Point {
   }
 
   _submitHandler(point) {
-    this._changePointsModelHander(point, ActionType.UPDATE, this._getUpdateType(point));
+    if (isOnline()) {
+      this._changePointsModelHander(point, ActionType.UPDATE, this._getUpdateType(point));
+    } else {
+      toast(`You can't submit point data offline`);
+    }
   }
 
   _clickFormCloseArrowHandler() {

@@ -6,4 +6,8 @@ const getRandomNumber = (min, max) => {
   return +((Math.random() * (max - min) + min).toFixed());
 };
 
-export {getRandomValueOfArray, getRandomNumber};
+const isOnline = () => {
+  return window.navigator.onLine;
+};
+
+export {getRandomValueOfArray, getRandomNumber, isOnline};

@@ -23,10 +23,10 @@ sortMap.set(SortMode.TIME, (a, b) => a.endDate.diff(a.startDate) - b.endDate.dif
 sortMap.set(SortMode.PRICE, (a, b) => a.price - b.price);
 
 class Trip {
-  constructor(tripInfoContainer, pointsInfoContainer, pointsModel, filterModel, offerModel, destinationModel, server) {
+  constructor(tripInfoContainer, pointsInfoContainer, pointsModel, filterModel, offerModel, destinationModel, provider) {
     this._tripInfoContainer = tripInfoContainer;
     this._pointsInfoContainer = pointsInfoContainer;
-    this._server = server;
+    this._provider = provider;
 
     this._sortView = null;
     this._pointListView = new TripEventsList();
@@ -168,7 +168,7 @@ class Trip {
     switch (actionType) {
       case ActionType.ADD:
         this.newPoint.setViewState(State.SAVING);
-        this._server.addPoint(updatedPoint)
+        this._provider.addPoint(updatedPoint)
           .then((response) => {
             this.newPoint.closeForm();
             return response;
@@ -182,7 +182,7 @@ class Trip {
         break;
       case ActionType.UPDATE:
         currentPointPresenter.setViewState(State.SAVING);
-        this._server.updatePoint(updatedPoint)
+        this._provider.updatePoint(updatedPoint)
           .then((response) => {
             if (this._openedPointPresenter) {
               currentPointPresenter.toggleFormToPoint();
@@ -198,7 +198,7 @@ class Trip {
         break;
       case ActionType.DELETE:
         currentPointPresenter.setViewState(State.DELETING);
-        this._server.deletePoint(updatedPoint.id)
+        this._provider.deletePoint(updatedPoint.id)
           .then(() => {
             currentPointPresenter.toggleFormToPoint();
           })

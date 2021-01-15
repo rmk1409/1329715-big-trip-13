@@ -43,12 +43,12 @@ class Points extends Observable {
     const {
       is_favorite: isFavorite,
       base_price: price,
-      startDate = dayjs(point.date_from),
-      endDate = dayjs(point.date_to),
       info = {description: point.destination.description, pictures: point.destination.pictures},
     } = point;
     const destination = point.destination.name;
-    const adaptedPoint = Object.assign({}, point, {isFavorite, startDate, endDate, price, destination, info});
+    const adaptedPoint = Object.assign({}, point, {isFavorite, price, destination, info});
+    adaptedPoint.startDate = dayjs(point.date_from);
+    adaptedPoint.endDate = dayjs(point.date_to);
 
     delete adaptedPoint.is_favorite;
     delete adaptedPoint.date_from;
@@ -76,6 +76,7 @@ class Points extends Observable {
     delete adaptedPoint.price;
     delete adaptedPoint.startDate;
     delete adaptedPoint.endDate;
+    delete adaptedPoint.info;
 
     return adaptedPoint;
   }
