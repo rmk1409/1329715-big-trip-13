@@ -185,23 +185,21 @@ class EditForm extends SmartView {
 
     const startTimeSettings = {
       enableTime: true,
-      // eslint-disable-next-line camelcase
-      time_24hr: true,
       dateFormat: `d/m/y H:i`,
       defaultDate: this._state.startDate.toDate(),
       onChange: this._changeStartDateHandler,
       maxDate: this._state.endDate.add(-MIN_START_END_DATE_DIFFERENCE_IN_MINUTES, `minute`).toDate(),
     };
+    startTimeSettings[`time_24hr`] = true;
 
     const endTimeSettings = {
       enableTime: true,
-      // eslint-disable-next-line camelcase
-      time_24hr: true,
       dateFormat: `d/m/y H:i`,
       defaultDate: this._state.endDate.toDate(),
       onChange: this._changeEndDateHandler,
       minDate: this._state.startDate.add(MIN_START_END_DATE_DIFFERENCE_IN_MINUTES, `minute`).toDate(),
     };
+    endTimeSettings[`time_24hr`] = true;
 
     this._startDatePicker = flatpickr(this.getElement().querySelector(`.event__input--time[name=event-start-time]`), startTimeSettings);
 

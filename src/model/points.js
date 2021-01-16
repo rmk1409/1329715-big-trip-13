@@ -59,18 +59,16 @@ class Points extends Observable {
   }
 
   static adaptToServer(point) {
-    const {
-      price: base_price,
-      date_from = new Date(point.startDate),
-      date_to = new Date(point.endDate),
-    } = point;
-
-    const adaptedPoint = Object.assign({}, point, {is_favorite: !!point.isFavorite, base_price, date_from, date_to});
-    adaptedPoint.destination = {
+    const adaptedPoint = Object.assign({}, point);
+    adaptedPoint[`destination`] = {
       name: point.destination,
       description: point.info.description,
       pictures: point.info.pictures,
     };
+    adaptedPoint[`base_price`] = point.price;
+    adaptedPoint[`date_from`] = new Date(point.startDate);
+    adaptedPoint[`date_to`] = new Date(point.endDate);
+    adaptedPoint[`is_favorite`] = !!point.isFavorite;
 
     delete adaptedPoint.isFavorite;
     delete adaptedPoint.price;
