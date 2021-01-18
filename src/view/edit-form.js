@@ -279,7 +279,8 @@ class EditForm extends SmartView {
     if (isChecked) {
       pointOffers.push(offer);
     } else {
-      pointOffers.splice(pointOffers.indexOf(offer), 1);
+      const index = pointOffers.findIndex((curOffer)=>curOffer.title === offer.title);
+      pointOffers.splice(index, 1);
     }
     this.updateData({offers: pointOffers}, false);
   }
