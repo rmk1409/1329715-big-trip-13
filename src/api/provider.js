@@ -85,7 +85,7 @@ class Provider {
     if (isOnline()) {
       resultPromise = this._server.addPoint(point)
         .then((newPoint) => {
-          this._store.setItem(RequestType.POINTS, newPoint.id, PointsModel.adaptToServer(newPoint), true);
+          this._store.setItem(RequestType.POINTS, newPoint.id, newPoint, true);
           return newPoint;
         });
     } else {

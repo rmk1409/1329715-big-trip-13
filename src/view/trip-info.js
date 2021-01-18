@@ -11,7 +11,11 @@ const createTripInfoTemplate = (points) => {
 
   if (points.length) {
     const firstPoint = points[0];
-    const lastPoint = points[points.length - 1];
+    let indexLastPoint = 0;
+    for (let i = 1; i < points.length; i++) {
+      indexLastPoint = points[indexLastPoint].endDate.isBefore(points[i].endDate) ? i : indexLastPoint;
+    }
+    const lastPoint = points[indexLastPoint];
 
     firstCity = firstPoint.destination;
     if (points[1]) {
