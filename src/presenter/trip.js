@@ -19,8 +19,8 @@ const SortMode = {
 
 const sortMap = new Map();
 sortMap.set(SortMode.DEFAULT, (a, b) => a.startDate.isBefore(b.startDate) ? -1 : 1);
-sortMap.set(SortMode.TIME, (a, b) => a.endDate.diff(a.startDate) - b.endDate.diff(b.startDate));
-sortMap.set(SortMode.PRICE, (a, b) => a.price - b.price);
+sortMap.set(SortMode.TIME, (a, b) => b.endDate.diff(b.startDate) - a.endDate.diff(a.startDate));
+sortMap.set(SortMode.PRICE, (a, b) => b.price - a.price);
 
 class Trip {
   constructor(tripInfoContainer, pointsInfoContainer, pointsModel, filterModel, offerModel, destinationModel, provider) {

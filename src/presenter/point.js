@@ -88,7 +88,8 @@ class Point {
     if (newPoint.destination !== this._point.destination
       || newPoint.startDate !== this._point.startDate
       || newPoint.endDate !== this._point.endDate
-      || newPoint.price !== this._point.price) {
+      || newPoint.price !== this._point.price
+      || newPoint.offers !== this._point.offers) {
       result = UpdateType.MAJOR;
     }
     return result;
